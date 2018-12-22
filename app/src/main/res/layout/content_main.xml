@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
+                    android:id="@+id/source_address"
                     android:hint="Source"
                     android:textSize="15sp"
                     android:background="#FFF"
@@ -48,6 +49,7 @@
             android:layout_height="wrap_content">
 
             <EditText
+                android:id="@+id/destination_address"
                 android:hint="Destination"
                 android:textSize="15sp"
                 android:background="#FFF"
@@ -77,6 +79,133 @@
             tools:context=".MainActivity" />
 
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:background="#000"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:padding="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:textColor="#d4db28"
+                    android:paddingBottom="3dp"
+                    android:text="Rs. 5000"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_directions_car_black_24dp"
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="#d4db28"/>
+
+                <TextView
+                    android:textColor="#d4db28"
+                    android:paddingTop="3dp"
+                    android:text="SLEEPER"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:padding="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:paddingBottom="3dp"
+                    android:text="Rs. 5000"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_directions_car_black_24dp"
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="#FF000000"/>
+
+                <TextView
+                    android:paddingTop="3dp"
+                    android:text="SLEEPER"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:padding="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:paddingBottom="3dp"
+                    android:text="Rs. 5000"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_directions_car_black_24dp"
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="#FF000000"/>
+
+                <TextView
+                    android:paddingTop="3dp"
+                    android:text="SLEEPER"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        
     </LinearLayout>
 
 </RelativeLayout>
