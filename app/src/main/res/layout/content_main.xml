@@ -11,6 +11,9 @@
 
 
     <LinearLayout
+        android:id="@+id/container"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:layout_width="match_parent"
@@ -31,7 +34,8 @@
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp" />
+                    android:layout_height="50dp"
+                    android:focusedByDefault="false"/>
 
                 <View
                     android:layout_marginLeft="20dp"
@@ -83,7 +87,7 @@
 
     <LinearLayout
         android:gravity="center"
-        android:background="#000"
+        android:background="#FFF"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -108,7 +112,6 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:textColor="#d4db28"
                     android:paddingBottom="3dp"
                     android:text="Rs. 5000"
                     android:layout_width="match_parent"
@@ -121,10 +124,9 @@
                     android:layout_height="30dp"
                     android:src="@drawable/ic_directions_car_black_24dp"
                     app:civ_border_width="2dp"
-                    app:civ_border_color="#d4db28"/>
+                    app:civ_border_color="#FF000000"/>
 
                 <TextView
-                    android:textColor="#d4db28"
                     android:paddingTop="3dp"
                     android:text="SLEEPER"
                     android:layout_width="match_parent"

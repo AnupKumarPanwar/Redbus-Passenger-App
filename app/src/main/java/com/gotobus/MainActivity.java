@@ -1,12 +1,15 @@
 package com.gotobus;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -22,22 +25,42 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
+import com.androidnetworking.AndroidNetworking;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import static android.provider.SettingsSlicesContract.KEY_LOCATION;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -58,7 +81,13 @@ public class MainActivity extends AppCompatActivity
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    MarkerOptions sourceMarkerOption, destinationMarkerOption;
+
+    int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION=2 ;
+
     EditText sourceAddress, destinationAddress;
+
+    LinearLayout container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +114,76 @@ public class MainActivity extends AppCompatActivity
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        AndroidNetworking.initialize(getApplicationContext());
+
+        container = findViewById(R.id.container);
+        container.requestFocus();
+
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
+
+        sourceAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_SOURCE);
+                } catch (GooglePlayServicesRepairableException e) {
+                    Log.e("Exception", e.getMessage());
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.e("Exception", e.getMessage());
+                }
+            }
+        });
+
+        sourceAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    try {
+                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                        startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_SOURCE);
+                    } catch (GooglePlayServicesRepairableException e) {
+                        Log.e("Exception", e.getMessage());
+                    } catch (GooglePlayServicesNotAvailableException e) {
+                        Log.e("Exception", e.getMessage());
+                    }
+                }
+            }
+        });
+
+
+
+        destinationAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_DESTINATION);
+                } catch (GooglePlayServicesRepairableException e) {
+                    Log.e("Exception", e.getMessage());
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.e("Exception", e.getMessage());
+                }
+            }
+        });
+
+        destinationAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    try {
+                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                        startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_DESTINATION);
+                    } catch (GooglePlayServicesRepairableException e) {
+                        Log.e("Exception", e.getMessage());
+                    } catch (GooglePlayServicesNotAvailableException e) {
+                        Log.e("Exception", e.getMessage());
+                    }
+                }
+            }
+        });
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +203,77 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == AUTOCOMPLETE_SOURCE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(getApplicationContext(), data);
+                sourceAddress.setText(place.getAddress());
+
+                mMap.clear();
+
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(place.getLatLng())
+                        .zoom(DEFAULT_ZOOM)
+                        .build();
+
+                sourceMarkerOption = new MarkerOptions()
+                        .position(place.getLatLng())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
+
+                mMap.addMarker(sourceMarkerOption);
+
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                if (destinationMarkerOption!=null) {
+                    mMap.addMarker(destinationMarkerOption);
+                    // Getting URL to the Google Directions API
+                    LatLng origin = sourceMarkerOption.getPosition();
+                    LatLng dest = destinationMarkerOption.getPosition();
+
+                    try {
+                        String url = getDirectionsUrl(origin, dest);
+                        DownloadTask downloadTask = new DownloadTask();
+                        downloadTask.execute(url);
+                    }
+                    catch (Exception e) {
+                        Log.d("Route exception" , e.getMessage());
+                    }
+                }
+            }
+        }
+        else if (requestCode == AUTOCOMPLETE_DESTINATION) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(getApplicationContext(), data);
+                destinationAddress.setText(place.getAddress());
+
+                mMap.clear();
+
+                destinationMarkerOption = new MarkerOptions()
+                        .position(place.getLatLng())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
+
+                mMap.addMarker(destinationMarkerOption);
+
+                if (sourceMarkerOption!=null) {
+                    mMap.addMarker(sourceMarkerOption);
+                    // Getting URL to the Google Directions API
+                    LatLng origin = sourceMarkerOption.getPosition();
+                    LatLng dest = destinationMarkerOption.getPosition();
+
+                    try {
+                        String url = getDirectionsUrl(origin, dest);
+                        DownloadTask downloadTask = new DownloadTask();
+                        downloadTask.execute(url);
+                    }
+                    catch (Exception e) {
+                        Log.d("Route exception" , e.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -177,6 +345,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
 
         mMap.setBuildingsEnabled(true);
         
@@ -226,6 +395,25 @@ public class MainActivity extends AppCompatActivity
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+                mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                        try{
+                            List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
+                            Address address = addresses.get(0);
+                            String currentAddress = address.getAddressLine(0);
+                            sourceAddress.setText(currentAddress);
+                        }
+                        catch (Exception e) {
+                            Log.e("Exception", e.getMessage());
+                        }
+
+                        return false;
+                    }
+                });
+
             } else {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -247,6 +435,12 @@ public class MainActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
+
+                            sourceMarkerOption = new MarkerOptions()
+                                    .position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
+                            mMap.addMarker(sourceMarkerOption);
+
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation
@@ -272,5 +466,160 @@ public class MainActivity extends AppCompatActivity
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+
+            parserTask.execute(result);
+
+        }
+    }
+
+
+    /**
+     * A class to parse the Google Places in JSON format
+     */
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsJSONParser parser = new DirectionsJSONParser();
+
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList();
+                lineOptions = new PolylineOptions();
+
+                List<HashMap<String, String>> path = result.get(i);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                lineOptions.addAll(points);
+                lineOptions.width(18);
+                lineOptions.color(Color.parseColor("#0fa4e6"));
+                lineOptions.geodesic(true);
+
+            }
+
+// Drawing polyline in the Google Map for the i-th route
+            try {
+                mMap.addPolyline(lineOptions);
+            }
+            catch (Exception e) {
+                Log.d("Polyline", e.getMessage());
+            }
+        }
+    }
+
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+        String mode = "mode=driving";
+
+        String apiKey = "key=" + getResources().getString(R.string.google_maps_key);
+        String callback = "callback=initialize";
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + apiKey + "&" + callback;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+
+        return url;
+    }
+
+    /**
+     * A method to download json data from url
+     */
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
     }
 }
