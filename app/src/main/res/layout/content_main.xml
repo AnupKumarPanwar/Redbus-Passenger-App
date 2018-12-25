@@ -74,7 +74,6 @@
 
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -113,22 +112,67 @@
 
                 <TextView
                     android:paddingBottom="3dp"
-                    android:text="Rs. 5000"
+                    android:text="Rs. 1000"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                    <!--android:layout_width="30dp"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:src="@drawable/sleeper"-->
+                    <!--app:civ_border_width="2dp"-->
+                    <!--app:civ_border_color="#FF000000"/>-->
+
+                <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_directions_car_black_24dp"
-                    app:civ_border_width="2dp"
-                    app:civ_border_color="#FF000000"/>
+                    android:src="@drawable/sleeper" />
 
                 <TextView
                     android:paddingTop="3dp"
                     android:text="SLEEPER"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:padding="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:paddingBottom="3dp"
+                    android:text="Rs. 2000"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"/>
+
+                <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                    <!--android:layout_width="30dp"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:src="@drawable/ac"-->
+                    <!--app:civ_border_width="2dp"-->
+                    <!--app:civ_border_color="#FF000000"/>-->
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ac" />
+
+                <TextView
+                    android:paddingTop="3dp"
+                    android:text="AC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
@@ -153,52 +197,22 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                    <!--android:layout_width="30dp"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:src="@drawable/volvo"-->
+                    <!--app:civ_border_width="2dp"-->
+                    <!--app:civ_border_color="#FF000000"/>-->
+
+                <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_directions_car_black_24dp"
-                    app:civ_border_width="2dp"
-                    app:civ_border_color="#FF000000"/>
+                    android:src="@drawable/volvo" />
 
                 <TextView
                     android:paddingTop="3dp"
-                    android:text="SLEEPER"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="90dp"
-                android:padding="5dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:paddingBottom="3dp"
-                    android:text="Rs. 5000"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_directions_car_black_24dp"
-                    app:civ_border_width="2dp"
-                    app:civ_border_color="#FF000000"/>
-
-                <TextView
-                    android:paddingTop="3dp"
-                    android:text="SLEEPER"
+                    android:text="VOLVO"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
