@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity
 
     String lineColor = "#0fa4e6";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,97 +199,12 @@ public class MainActivity extends AppCompatActivity
         sleeper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AndroidNetworking.post(baseUrl + "/search.php")
-                        .setOkHttpClient(NetworkCookies.okHttpClient)
-                        .addBodyParameter("slat", String.valueOf(sourceMarkerOption.getPosition().latitude))
-                        .addBodyParameter("slong", String.valueOf(sourceMarkerOption.getPosition().longitude))
-                        .addBodyParameter("dlat", String.valueOf(destinationMarkerOption.getPosition().latitude))
-                        .addBodyParameter("dlong", String.valueOf(destinationMarkerOption.getPosition().longitude))
-                        .addBodyParameter("type", "Volvo")
-                        .setPriority(Priority.MEDIUM)
-                        .build()
-                        .getAsJSONObject(new JSONObjectRequestListener() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    JSONObject result = response.getJSONObject("result");
-                                    boolean success = Boolean.parseBoolean(result.get("success").toString());
-                                    if (success) {
-                                        JSONObject data = result.getJSONObject("data");
-                                        nearestSourceLat = data.getJSONArray("neareatSource").get(0).toString();
-                                        nearestSourceLong = data.getJSONArray("neareatSource").get(1).toString();
-
-                                        nearestDestinationLat = data.getJSONArray("nearestDestination").get(0).toString();
-                                        nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
-                                        String waypoints = "";
-                                        waypoints = data.getJSONObject("route").get("waypoints").toString();
-                                        busSource = data.getJSONObject("route").get("sourceLatLong").toString().split(",");
-                                        busDestination = data.getJSONObject("route").get("destinationLatLong").toString().split(",");
-                                        LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
-                                        LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
-
-                                        lineColor = "#0fa4e6";
-                                        String url = getDirectionsUrl(origin, dest, waypoints);
-                                        DownloadTask downloadTask = new DownloadTask(lineColor);
-                                        downloadTask.execute(url);
-
-                                        origin = sourceMarkerOption.getPosition();
-                                        dest = new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong));
-                                        String pickupAddress="Pickup point";
-                                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                                        try {
-                                            List<Address> addresses = geocoder.getFromLocation(dest.latitude, dest.longitude, 1);
-                                            Address address = addresses.get(0);
-                                            pickupAddress = address.getAddressLine(0);
-                                        } catch (Exception e) {
-                                            Log.e("Exception", e.getMessage());
-                                        }
-                                        MarkerOptions nearestSourceOption = new MarkerOptions()
-                                                .title(pickupAddress)
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
-                                                .position(dest);
-                                        mMap.addMarker(nearestSourceOption);
-                                        waypoints="";
-                                        lineColor = "#00FF00";
-                                        String url1 = getDirectionsUrl(origin, dest, waypoints);
-                                        DownloadTask downloadTask1 = new DownloadTask(lineColor);
-                                        downloadTask1.execute(url1);
-
-                                        origin = new LatLng(Double.parseDouble(nearestDestinationLat), Double.parseDouble(nearestDestinationLong));
-                                        dest = destinationMarkerOption.getPosition();
-                                        String dropAddress="Pickup point";
-                                        try {
-                                            List<Address> addresses = geocoder.getFromLocation(origin.latitude, origin.longitude, 1);
-                                            Address address = addresses.get(0);
-                                            dropAddress = address.getAddressLine(0);
-                                        } catch (Exception e) {
-                                            Log.e("Exception", e.getMessage());
-                                        }
-                                        MarkerOptions nearestDestinationOption = new MarkerOptions()
-                                                .title(dropAddress)
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
-                                                .position(origin);
-                                        mMap.addMarker(nearestDestinationOption);
-                                        waypoints="";
-                                        lineColor = "#FF0000";
-                                        String url2 = getDirectionsUrl(origin, dest, waypoints);
-                                        DownloadTask downloadTask2 = new DownloadTask(lineColor);
-                                        downloadTask2.execute(url2);
-
-                                    } else {
-                                        String message = result.get("message").toString();
-                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            @Override
-                            public void onError(ANError error) {
-                                Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
-                            }
-                        });
+                if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
+                    searchBus("Volvo");
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -311,6 +227,100 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void searchBus(String busType) {
+        AndroidNetworking.post(baseUrl + "/search.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addBodyParameter("slat", String.valueOf(sourceMarkerOption.getPosition().latitude))
+                .addBodyParameter("slong", String.valueOf(sourceMarkerOption.getPosition().longitude))
+                .addBodyParameter("dlat", String.valueOf(destinationMarkerOption.getPosition().latitude))
+                .addBodyParameter("dlong", String.valueOf(destinationMarkerOption.getPosition().longitude))
+                .addBodyParameter("type", busType)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                JSONObject data = result.getJSONObject("data");
+                                nearestSourceLat = data.getJSONArray("neareatSource").get(0).toString();
+                                nearestSourceLong = data.getJSONArray("neareatSource").get(1).toString();
+
+                                nearestDestinationLat = data.getJSONArray("nearestDestination").get(0).toString();
+                                nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
+                                String waypoints = "";
+                                waypoints = data.getJSONObject("route").get("waypoints").toString();
+                                busSource = data.getJSONObject("route").get("sourceLatLong").toString().split(",");
+                                busDestination = data.getJSONObject("route").get("destinationLatLong").toString().split(",");
+                                LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
+                                LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
+
+                                lineColor = "#0fa4e6";
+                                String url = getDirectionsUrl(origin, dest, waypoints);
+                                DownloadTask downloadTask = new DownloadTask(lineColor);
+                                downloadTask.execute(url);
+
+                                origin = sourceMarkerOption.getPosition();
+                                dest = new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong));
+                                String pickupAddress="Pickup point";
+                                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                try {
+                                    List<Address> addresses = geocoder.getFromLocation(dest.latitude, dest.longitude, 1);
+                                    Address address = addresses.get(0);
+                                    pickupAddress = address.getAddressLine(0);
+                                } catch (Exception e) {
+                                    Log.e("Exception", e.getMessage());
+                                }
+                                MarkerOptions nearestSourceOption = new MarkerOptions()
+                                        .title(pickupAddress)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
+                                        .position(dest);
+                                mMap.addMarker(nearestSourceOption);
+                                waypoints="";
+                                lineColor = "#00FF00";
+                                String url1 = getDirectionsUrl(origin, dest, waypoints);
+                                DownloadTask downloadTask1 = new DownloadTask(lineColor);
+                                downloadTask1.execute(url1);
+
+                                origin = new LatLng(Double.parseDouble(nearestDestinationLat), Double.parseDouble(nearestDestinationLong));
+                                dest = destinationMarkerOption.getPosition();
+                                String dropAddress="Pickup point";
+                                try {
+                                    List<Address> addresses = geocoder.getFromLocation(origin.latitude, origin.longitude, 1);
+                                    Address address = addresses.get(0);
+                                    dropAddress = address.getAddressLine(0);
+                                } catch (Exception e) {
+                                    Log.e("Exception", e.getMessage());
+                                }
+                                MarkerOptions nearestDestinationOption = new MarkerOptions()
+                                        .title(dropAddress)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
+                                        .position(origin);
+                                mMap.addMarker(nearestDestinationOption);
+                                waypoints="";
+                                lineColor = "#FF0000";
+                                String url2 = getDirectionsUrl(origin, dest, waypoints);
+                                DownloadTask downloadTask2 = new DownloadTask(lineColor);
+                                downloadTask2.execute(url2);
+
+                            } else {
+                                String message = result.get("message").toString();
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError error) {
+                        Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     @Override
