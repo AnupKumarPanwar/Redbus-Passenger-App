@@ -100,6 +100,7 @@
             android:weightSum="3">
 
             <LinearLayout
+                android:id="@+id/sleeper"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"

@@ -26,8 +26,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +50,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -79,12 +84,18 @@ public class MainActivity extends AppCompatActivity
     private static final String KEY_LOCATION = "location";
 
     MarkerOptions sourceMarkerOption, destinationMarkerOption;
+    String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
+    String [] busSource;
+    String[] busDestination;
 
     int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION=2 ;
 
     EditText sourceAddress, destinationAddress;
 
-    LinearLayout container;
+    LinearLayout container, sleeper;
+    String baseUrl;
+
+    String lineColor = "#0fa4e6";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +122,7 @@ public class MainActivity extends AppCompatActivity
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        baseUrl = getResources().getString(R.string.base_url);
         AndroidNetworking.initialize(getApplicationContext());
 
         container = findViewById(R.id.container);
@@ -181,6 +193,105 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        sleeper = findViewById(R.id.sleeper);
+
+        sleeper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AndroidNetworking.post(baseUrl + "/search.php")
+                        .setOkHttpClient(NetworkCookies.okHttpClient)
+                        .addBodyParameter("slat", String.valueOf(sourceMarkerOption.getPosition().latitude))
+                        .addBodyParameter("slong", String.valueOf(sourceMarkerOption.getPosition().longitude))
+                        .addBodyParameter("dlat", String.valueOf(destinationMarkerOption.getPosition().latitude))
+                        .addBodyParameter("dlong", String.valueOf(destinationMarkerOption.getPosition().longitude))
+                        .addBodyParameter("type", "Volvo")
+                        .setPriority(Priority.MEDIUM)
+                        .build()
+                        .getAsJSONObject(new JSONObjectRequestListener() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    JSONObject result = response.getJSONObject("result");
+                                    boolean success = Boolean.parseBoolean(result.get("success").toString());
+                                    if (success) {
+                                        JSONObject data = result.getJSONObject("data");
+                                        nearestSourceLat = data.getJSONArray("neareatSource").get(0).toString();
+                                        nearestSourceLong = data.getJSONArray("neareatSource").get(1).toString();
+
+                                        nearestDestinationLat = data.getJSONArray("nearestDestination").get(0).toString();
+                                        nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
+                                        String waypoints = "";
+                                        waypoints = data.getJSONObject("route").get("waypoints").toString();
+                                        busSource = data.getJSONObject("route").get("sourceLatLong").toString().split(",");
+                                        busDestination = data.getJSONObject("route").get("destinationLatLong").toString().split(",");
+                                        LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
+                                        LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
+
+                                        lineColor = "#0fa4e6";
+                                        String url = getDirectionsUrl(origin, dest, waypoints);
+                                        DownloadTask downloadTask = new DownloadTask(lineColor);
+                                        downloadTask.execute(url);
+
+                                        origin = sourceMarkerOption.getPosition();
+                                        dest = new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong));
+                                        String pickupAddress="Pickup point";
+                                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                        try {
+                                            List<Address> addresses = geocoder.getFromLocation(dest.latitude, dest.longitude, 1);
+                                            Address address = addresses.get(0);
+                                            pickupAddress = address.getAddressLine(0);
+                                        } catch (Exception e) {
+                                            Log.e("Exception", e.getMessage());
+                                        }
+                                        MarkerOptions nearestSourceOption = new MarkerOptions()
+                                                .title(pickupAddress)
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
+                                                .position(dest);
+                                        mMap.addMarker(nearestSourceOption);
+                                        waypoints="";
+                                        lineColor = "#00FF00";
+                                        String url1 = getDirectionsUrl(origin, dest, waypoints);
+                                        DownloadTask downloadTask1 = new DownloadTask(lineColor);
+                                        downloadTask1.execute(url1);
+
+                                        origin = new LatLng(Double.parseDouble(nearestDestinationLat), Double.parseDouble(nearestDestinationLong));
+                                        dest = destinationMarkerOption.getPosition();
+                                        String dropAddress="Pickup point";
+                                        try {
+                                            List<Address> addresses = geocoder.getFromLocation(origin.latitude, origin.longitude, 1);
+                                            Address address = addresses.get(0);
+                                            dropAddress = address.getAddressLine(0);
+                                        } catch (Exception e) {
+                                            Log.e("Exception", e.getMessage());
+                                        }
+                                        MarkerOptions nearestDestinationOption = new MarkerOptions()
+                                                .title(dropAddress)
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
+                                                .position(origin);
+                                        mMap.addMarker(nearestDestinationOption);
+                                        waypoints="";
+                                        lineColor = "#FF0000";
+                                        String url2 = getDirectionsUrl(origin, dest, waypoints);
+                                        DownloadTask downloadTask2 = new DownloadTask(lineColor);
+                                        downloadTask2.execute(url2);
+
+                                    } else {
+                                        String message = result.get("message").toString();
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(ANError error) {
+                                Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+        });
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -226,18 +337,19 @@ public class MainActivity extends AppCompatActivity
 
                 if (destinationMarkerOption!=null) {
                     mMap.addMarker(destinationMarkerOption);
-                    // Getting URL to the Google Directions API
-                    LatLng origin = sourceMarkerOption.getPosition();
-                    LatLng dest = destinationMarkerOption.getPosition();
+//                    // Getting URL to the Google Directions API
+//                    LatLng origin = sourceMarkerOption.getPosition();
+//                    LatLng dest = destinationMarkerOption.getPosition();
+//                    String waypoints = "";
 
-                    try {
-                        String url = getDirectionsUrl(origin, dest);
-                        DownloadTask downloadTask = new DownloadTask();
-                        downloadTask.execute(url);
-                    }
-                    catch (Exception e) {
-                        Log.d("Route exception" , e.getMessage());
-                    }
+//                    try {
+//                        String url = getDirectionsUrl(origin, dest, waypoints);
+//                        DownloadTask downloadTask = new DownloadTask();
+//                        downloadTask.execute(url);
+//                    }
+//                    catch (Exception e) {
+//                        Log.d("Route exception" , e.getMessage());
+//                    }
                 }
             }
         }
@@ -256,18 +368,19 @@ public class MainActivity extends AppCompatActivity
 
                 if (sourceMarkerOption!=null) {
                     mMap.addMarker(sourceMarkerOption);
-                    // Getting URL to the Google Directions API
-                    LatLng origin = sourceMarkerOption.getPosition();
-                    LatLng dest = destinationMarkerOption.getPosition();
-
-                    try {
-                        String url = getDirectionsUrl(origin, dest);
-                        DownloadTask downloadTask = new DownloadTask();
-                        downloadTask.execute(url);
-                    }
-                    catch (Exception e) {
-                        Log.d("Route exception" , e.getMessage());
-                    }
+//                    // Getting URL to the Google Directions API
+//                    LatLng origin = sourceMarkerOption.getPosition();
+//                    LatLng dest = destinationMarkerOption.getPosition();
+//                    String waypoints = "";
+//
+//                    try {
+//                        String url = getDirectionsUrl(origin, dest, waypoints);
+//                        DownloadTask downloadTask = new DownloadTask();
+//                        downloadTask.execute(url);
+//                    }
+//                    catch (Exception e) {
+//                        Log.d("Route exception" , e.getMessage());
+//                    }
                 }
             }
         }
@@ -396,15 +509,16 @@ public class MainActivity extends AppCompatActivity
                 mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {
-                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                        try{
-                            List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
-                            Address address = addresses.get(0);
-                            String currentAddress = address.getAddressLine(0);
-                            sourceAddress.setText(currentAddress);
-                        }
-                        catch (Exception e) {
-                            Log.e("Exception", e.getMessage());
+                        if (sourceAddress.getText().toString().length()==0) {
+                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                            try {
+                                List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
+                                Address address = addresses.get(0);
+                                String currentAddress = address.getAddressLine(0);
+                                sourceAddress.setText(currentAddress);
+                            } catch (Exception e) {
+                                Log.e("Exception", e.getMessage());
+                            }
                         }
 
                         return false;
@@ -466,7 +580,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private class DownloadTask extends AsyncTask<String, Void, String> {
-
+        String lineColor;
+        public  DownloadTask (String lineColor) {
+            this.lineColor = lineColor;
+        }
         @Override
         protected String doInBackground(String... url) {
 
@@ -484,9 +601,7 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            ParserTask parserTask = new ParserTask();
-
-
+            ParserTask parserTask = new ParserTask(lineColor);
             parserTask.execute(result);
 
         }
@@ -498,6 +613,10 @@ public class MainActivity extends AppCompatActivity
      */
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
+        String lineColor;
+        public  ParserTask (String lineColor) {
+            this.lineColor = lineColor;
+        }
         // Parsing the data in non-ui thread
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
@@ -540,7 +659,7 @@ public class MainActivity extends AppCompatActivity
 
                 lineOptions.addAll(points);
                 lineOptions.width(18);
-                lineOptions.color(Color.parseColor("#0fa4e6"));
+                lineOptions.color(Color.parseColor(lineColor));
                 lineOptions.geodesic(true);
 
             }
@@ -555,7 +674,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private String getDirectionsUrl(LatLng origin, LatLng dest, String waypoints) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -572,7 +691,7 @@ public class MainActivity extends AppCompatActivity
         // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + apiKey + "&" + callback;
 
-//        parameters += "&waypoints=30.6775, 76.8115| 30.6864, 76.7986| 30.7055, 76.8013";
+        parameters += "&waypoints=" + waypoints;
         // Output format
         String output = "json";
 
