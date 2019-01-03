@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences.Editor editor;
 
     String eta="";
+    int etaValue = 0;
     TextView sleeperETA, acETA, volvoETA;
 
 
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity
                 intent.putExtra("source", pickupAddress);
                 intent.putExtra("destination", dropAddress);
                 intent.putExtra("bus_id", busId);
+                intent.putExtra("eta", etaValue);
                 startActivity(intent);
             }
         });
@@ -448,6 +450,7 @@ public class MainActivity extends AppCompatActivity
 
                                                         if (legs.length()>0) {
                                                             eta = legs.getJSONObject(0).getJSONObject("duration").get("text").toString();
+                                                            etaValue = Integer.parseInt(legs.getJSONObject(0).getJSONObject("duration").get("value").toString());
                                                             if (busType.equals("Sleeper")) {
                                                                 sleeperETA.setText(eta);
                                                             }
