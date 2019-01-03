@@ -112,8 +112,9 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/sleeper_eta"
                     android:paddingBottom="3dp"
-                    android:text="Rs. 1000"
+                    android:text="---"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
@@ -141,6 +142,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ac"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
@@ -152,8 +154,9 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/ac_eta"
                     android:paddingBottom="3dp"
-                    android:text="Rs. 2000"
+                    android:text="---"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
@@ -181,6 +184,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/volvo"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
@@ -192,8 +196,9 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/volvo_eta"
                     android:paddingBottom="3dp"
-                    android:text="Rs. 5000"
+                    android:text="---"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"/>
@@ -221,6 +226,37 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:weightSum="2"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/book_now"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:text="GoTo Now"
+                android:background="@drawable/orange_rect_button"
+                android:textColor="#FFF"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="40dp"
+                android:background="#FFF"/>
+
+            <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:text="View More"
+                android:background="@drawable/orange_rect_button"
+                android:textColor="#FFF"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

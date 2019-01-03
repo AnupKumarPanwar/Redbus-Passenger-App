@@ -1,6 +1,7 @@
 package com.gotobus;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -24,8 +25,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
@@ -45,11 +48,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,8 +88,10 @@ public class MainActivity extends AppCompatActivity
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    MarkerOptions sourceMarkerOption, destinationMarkerOption;
+    MarkerOptions sourceMarkerOption, destinationMarkerOption, busMarker;
     String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
+    String pickupAddress="Pickup point";
+    String dropAddress="Drop-off point";
     String [] busSource;
     String[] busDestination;
 
@@ -92,10 +99,22 @@ public class MainActivity extends AppCompatActivity
 
     EditText sourceAddress, destinationAddress;
 
-    LinearLayout container, sleeper;
+    LinearLayout container, sleeper, ac, volvo;
     String baseUrl;
 
     String lineColor = "#0fa4e6";
+
+    Button bookNow;
+
+    String busName = "", busNumber = "", busPhone = "", busId = "";
+
+    SharedPreferences sharedPreferences;
+    String PREFS_NAME = "MyApp_Settings";
+    String accessToken;
+    SharedPreferences.Editor editor;
+
+    String eta="";
+    TextView sleeperETA, acETA, volvoETA;
 
 
     @Override
@@ -124,13 +143,35 @@ public class MainActivity extends AppCompatActivity
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         baseUrl = getResources().getString(R.string.base_url);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        accessToken = sharedPreferences.getString("access_token", null);
+
         AndroidNetworking.initialize(getApplicationContext());
 
         container = findViewById(R.id.container);
         container.requestFocus();
 
+        sleeperETA = findViewById(R.id.sleeper_eta);
+        acETA = findViewById(R.id.ac_eta);
+        volvoETA = findViewById(R.id.volvo_eta);
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
+        bookNow = findViewById(R.id.book_now);
+
+        bookNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), BookBusActivity.class);
+                intent.putExtra("name", busName);
+                intent.putExtra("bus_number", busNumber);
+                intent.putExtra("phone", busPhone);
+                intent.putExtra("source", pickupAddress);
+                intent.putExtra("destination", dropAddress);
+                intent.putExtra("bus_id", busId);
+                startActivity(intent);
+            }
+        });
 
         sourceAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,8 +236,34 @@ public class MainActivity extends AppCompatActivity
         });
 
         sleeper = findViewById(R.id.sleeper);
+        ac = findViewById(R.id.ac);
+        volvo = findViewById(R.id.volvo);
 
         sleeper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
+                    searchBus("Sleeper");
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        ac.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
+                    searchBus("AC");
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        volvo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
@@ -229,9 +296,13 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void searchBus(String busType) {
+    private void searchBus(final String busType) {
+        mMap.clear();
+        mMap.addMarker(sourceMarkerOption);
+        mMap.addMarker(destinationMarkerOption);
         AndroidNetworking.post(baseUrl + "/search.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
                 .addBodyParameter("slat", String.valueOf(sourceMarkerOption.getPosition().latitude))
                 .addBodyParameter("slong", String.valueOf(sourceMarkerOption.getPosition().longitude))
                 .addBodyParameter("dlat", String.valueOf(destinationMarkerOption.getPosition().latitude))
@@ -253,9 +324,14 @@ public class MainActivity extends AppCompatActivity
                                 nearestDestinationLat = data.getJSONArray("nearestDestination").get(0).toString();
                                 nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
                                 String waypoints = "";
-                                waypoints = data.getJSONObject("route").get("waypoints").toString();
-                                busSource = data.getJSONObject("route").get("sourceLatLong").toString().split(",");
-                                busDestination = data.getJSONObject("route").get("destinationLatLong").toString().split(",");
+                                JSONObject route = data.getJSONObject("route");
+                                busId = route.get("bus_id").toString();
+                                busName = route.get("name").toString();
+                                busPhone = route.get("phone").toString();
+                                busNumber = route.get("bus_number").toString();
+                                waypoints = route.get("waypoints").toString();
+                                busSource = route.get("sourceLatLong").toString().split(",");
+                                busDestination = route.get("destinationLatLong").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
                                 LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
 
@@ -265,8 +341,8 @@ public class MainActivity extends AppCompatActivity
                                 downloadTask.execute(url);
 
                                 origin = sourceMarkerOption.getPosition();
+                                setETA(busId, origin, busType);
                                 dest = new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong));
-                                String pickupAddress="Pickup point";
                                 Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                                 try {
                                     List<Address> addresses = geocoder.getFromLocation(dest.latitude, dest.longitude, 1);
@@ -288,7 +364,7 @@ public class MainActivity extends AppCompatActivity
 
                                 origin = new LatLng(Double.parseDouble(nearestDestinationLat), Double.parseDouble(nearestDestinationLong));
                                 dest = destinationMarkerOption.getPosition();
-                                String dropAddress="Pickup point";
+
                                 try {
                                     List<Address> addresses = geocoder.getFromLocation(origin.latitude, origin.longitude, 1);
                                     Address address = addresses.get(0);
@@ -309,6 +385,13 @@ public class MainActivity extends AppCompatActivity
 
                             } else {
                                 String message = result.get("message").toString();
+                                if (message.equals("Invalid access token.")) {
+                                    editor.putString("access_token", null);
+                                    editor.commit();
+                                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
                                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
@@ -319,6 +402,89 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onError(ANError error) {
                         Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void setETA(String busId, final LatLng dest, final String busType) {
+        AndroidNetworking.post(baseUrl + "/getBusLocation.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("id", busId)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                JSONObject data = result.getJSONObject("data");
+                                String[] busLocation = data.get("last_location").toString().split(",");
+                                LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
+                                float bearing = Float.parseFloat(data.get("bearing").toString());
+                                busMarker = new MarkerOptions()
+                                        .position(origin)
+                                        .flat(true)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_marker));
+
+                                Marker marker = mMap.addMarker(busMarker);
+                                marker.setRotation(bearing);
+
+                                String url = getDirectionsUrl(origin, dest, "");
+
+                                AndroidNetworking.get(url)
+                                        .setOkHttpClient(NetworkCookies.okHttpClient)
+                                        .build()
+                                        .getAsJSONObject(new JSONObjectRequestListener() {
+                                            @Override
+                                            public void onResponse(JSONObject response) {
+                                                try {
+                                                    JSONArray result = response.getJSONArray("routes");
+                                                    if (result.length()>0) {
+                                                        JSONObject route = result.getJSONObject(0);
+                                                        JSONArray legs = route.getJSONArray("legs");
+
+                                                        if (legs.length()>0) {
+                                                            eta = legs.getJSONObject(0).getJSONObject("duration").get("text").toString();
+                                                            if (busType.equals("Sleeper")) {
+                                                                sleeperETA.setText(eta);
+                                                            }
+                                                            else if (busType.equals("AC")) {
+                                                                acETA.setText(eta);
+                                                            }
+                                                            else if (busType.equals("Volvo")) {
+                                                                volvoETA.setText(eta);
+                                                            }
+                                                        }
+                                                        else {
+                                                            Toast.makeText(getApplicationContext(), "Unable to calculate ETA", Toast.LENGTH_LONG).show();
+                                                        }
+
+                                                    }
+                                                }
+                                                catch (Exception e) {
+
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onError(ANError anError) {
+
+                                            }
+                                        });
+
+                            }
+                        }
+                        catch (Exception e) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+
                     }
                 });
     }
