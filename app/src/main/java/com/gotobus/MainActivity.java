@@ -309,6 +309,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void searchBus(final String busType, final boolean buildRoute) {
+        if(!buildRoute) {
+            progressDialog.setMessage("Fetching ETA...");
+        }
+        else {
+            progressDialog.setMessage("Fetching routes...");
+        }
         progressDialog.show();
         mMap.clear();
         mMap.addMarker(sourceMarkerOption);
