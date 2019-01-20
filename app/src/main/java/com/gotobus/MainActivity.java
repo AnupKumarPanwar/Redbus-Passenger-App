@@ -351,13 +351,13 @@ public class MainActivity extends AppCompatActivity
                                             .position(origin)
                                             .flat(true)
                                             .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
                                 } else if (busType.equals("Volvo")) {
                                     busMarker = new MarkerOptions()
                                             .position(origin)
                                             .flat(true)
                                             .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
                                 }
                                 if (currentBusMarker!=null) {
                                     currentBusMarker.remove();
@@ -533,13 +533,13 @@ public class MainActivity extends AppCompatActivity
                                             .position(origin)
                                             .flat(true)
                                             .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
                                 } else if (busType.equals("Volvo")) {
                                     busMarker = new MarkerOptions()
                                             .position(origin)
                                             .flat(true)
                                             .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
                                 }
 
                                 mMap.addMarker(busMarker);
