@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -119,6 +120,10 @@ public class MainActivity extends AppCompatActivity
     TextView sleeperETA, acETA, volvoETA;
 
     ProgressDialog progressDialog;
+    Handler handler;
+    Runnable getBusLocationRunnable;
+    boolean tripCompleted = false;
+    Marker currentBusMarker;
 
 
     @Override
@@ -162,6 +167,17 @@ public class MainActivity extends AppCompatActivity
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
         bookNow = findViewById(R.id.book_now);
+
+        handler = new Handler();
+        getBusLocationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                getBusLocation(busId);
+                if (!tripCompleted) {
+                    handler.postDelayed(this, 12000);
+                }
+            }
+        };
 
         bookNow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -304,6 +320,63 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    private void getBusLocation(String busId) {
+        AndroidNetworking.post(baseUrl + "/getBusLocation.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("id", busId)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                JSONObject data = result.getJSONObject("data");
+                                String[] busLocation = data.get("last_location").toString().split(",");
+                                LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
+                                float bearing = Float.parseFloat(data.get("bearing").toString());
+                                String busType = data.get("bus_type").toString();
+//                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
+                                if (busType.equals("Sleeper")) {
+                                    busMarker = new MarkerOptions()
+                                            .position(origin)
+                                            .flat(true)
+                                            .rotation(bearing)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                } else if (busType.equals("AC")) {
+                                    busMarker = new MarkerOptions()
+                                            .position(origin)
+                                            .flat(true)
+                                            .rotation(bearing)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
+                                } else if (busType.equals("Volvo")) {
+                                    busMarker = new MarkerOptions()
+                                            .position(origin)
+                                            .flat(true)
+                                            .rotation(bearing)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
+                                }
+                                if (currentBusMarker!=null) {
+                                    currentBusMarker.remove();
+                                }
+                                currentBusMarker = mMap.addMarker(busMarker);
+                            }
+                        } catch (Exception e) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+
+                    }
+                });
+
+    }
+
     private void searchBus(final String busType, final boolean buildRoute) {
         if (!buildRoute) {
             progressDialog.setMessage("Fetching ETA...");
@@ -351,6 +424,8 @@ public class MainActivity extends AppCompatActivity
                                 setETA(busId, origin, busType);
 
                                 if (buildRoute) {
+                                    mMap.clear();
+                                    handler.postDelayed(getBusLocationRunnable, 12000);
 
                                     lineColor = "#0fa4e6";
                                     String url = getDirectionsUrl(origin, dest, waypoints);
@@ -451,23 +526,23 @@ public class MainActivity extends AppCompatActivity
                                     busMarker = new MarkerOptions()
                                             .position(origin)
                                             .flat(true)
+                                            .rotation(bearing)
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
-                                }
-                                else if (busType.equals("AC")) {
+                                } else if (busType.equals("AC")) {
                                     busMarker = new MarkerOptions()
                                             .position(origin)
                                             .flat(true)
+                                            .rotation(bearing)
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
-                                }
-                                else if (busType.equals("Volvo")) {
+                                } else if (busType.equals("Volvo")) {
                                     busMarker = new MarkerOptions()
                                             .position(origin)
                                             .flat(true)
+                                            .rotation(bearing)
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
                                 }
 
-                                Marker marker = mMap.addMarker(busMarker);
-                                marker.setRotation(bearing);
+                                mMap.addMarker(busMarker);
 
                                 String url = getDirectionsUrl(origin, dest, "");
 
