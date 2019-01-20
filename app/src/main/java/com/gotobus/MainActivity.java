@@ -447,10 +447,24 @@ public class MainActivity extends AppCompatActivity
                                 String[] busLocation = data.get("last_location").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
                                 float bearing = Float.parseFloat(data.get("bearing").toString());
-                                busMarker = new MarkerOptions()
-                                        .position(origin)
-                                        .flat(true)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_marker));
+                                if (busType.equals("Sleeper")) {
+                                    busMarker = new MarkerOptions()
+                                            .position(origin)
+                                            .flat(true)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                }
+                                else if (busType.equals("AC")) {
+                                    busMarker = new MarkerOptions()
+                                            .position(origin)
+                                            .flat(true)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
+                                }
+                                else if (busType.equals("Volvo")) {
+                                    busMarker = new MarkerOptions()
+                                            .position(origin)
+                                            .flat(true)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
+                                }
 
                                 Marker marker = mMap.addMarker(busMarker);
                                 marker.setRotation(bearing);
@@ -840,6 +854,9 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            if (result == null) {
+                return;
+            }
             ArrayList points = null;
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
