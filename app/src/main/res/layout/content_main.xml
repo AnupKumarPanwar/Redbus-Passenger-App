@@ -4,48 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center|top"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    tools:showIn="@layout/app_bar_main"
-    android:gravity="center|top">
+    tools:showIn="@layout/app_bar_main">
 
 
     <LinearLayout
         android:id="@+id/container"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center"
         android:orientation="vertical">
 
-            <RelativeLayout
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/source_address"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="50dp"
+                android:background="#FFF"
+                android:focusedByDefault="false"
+                android:hint="Source"
+                android:paddingLeft="40dp"
+                android:paddingTop="5dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="5dp"
+                android:textSize="15sp" />
 
-                <EditText
-                    android:id="@+id/source_address"
-                    android:hint="Source"
-                    android:textSize="15sp"
-                    android:background="#FFF"
-                    android:paddingLeft="40dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:focusedByDefault="false"/>
+            <View
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:background="#00FF00" />
 
-                <View
-                    android:layout_marginLeft="20dp"
-                    android:layout_centerVertical="true"
-                    android:layout_width="7dp"
-                    android:layout_height="7dp"
-                    android:background="#00FF00"/>
-
-            </RelativeLayout>
-
+        </RelativeLayout>
 
 
         <RelativeLayout
@@ -54,22 +53,22 @@
 
             <EditText
                 android:id="@+id/destination_address"
-                android:hint="Destination"
-                android:textSize="15sp"
-                android:background="#FFF"
-                android:paddingLeft="40dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp" />
+                android:layout_height="50dp"
+                android:background="#FFF"
+                android:hint="Destination"
+                android:paddingLeft="40dp"
+                android:paddingTop="5dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="5dp"
+                android:textSize="15sp" />
 
             <View
-                android:layout_marginLeft="20dp"
-                android:layout_centerVertical="true"
                 android:layout_width="7dp"
                 android:layout_height="7dp"
-                android:background="#FF0000"/>
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:background="#FF0000" />
         </RelativeLayout>
 
 
@@ -85,47 +84,47 @@
     </LinearLayout>
 
     <LinearLayout
-        android:gravity="center"
-        android:background="#FFF"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFF"
+        android:gravity="center"
         android:orientation="vertical">
-        
+
         <LinearLayout
-            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="90dp"
+            android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="3">
 
             <LinearLayout
                 android:id="@+id/sleeper"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="90dp"
-                android:padding="5dp"
-                android:orientation="vertical">
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/sleeper_eta"
-                    android:paddingBottom="3dp"
-                    android:text="---"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:paddingBottom="3dp"
+                    android:text="---" />
 
                 <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="30dp"-->
-                    <!--android:layout_height="30dp"-->
-                    <!--android:src="@drawable/sleeper"-->
-                    <!--app:civ_border_width="2dp"-->
-                    <!--app:civ_border_color="#FF000000"/>-->
+                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                <!--android:layout_width="30dp"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:src="@drawable/sleeper"-->
+                <!--app:civ_border_width="2dp"-->
+                <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
                     android:layout_width="30dp"
@@ -133,41 +132,41 @@
                     android:src="@drawable/sleeper" />
 
                 <TextView
-                    android:paddingTop="3dp"
-                    android:text="SLEEPER"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:text="SLEEPER" />
 
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/ac"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="90dp"
-                android:padding="5dp"
-                android:orientation="vertical">
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/ac_eta"
-                    android:paddingBottom="3dp"
-                    android:text="---"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:paddingBottom="3dp"
+                    android:text="---" />
 
                 <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="30dp"-->
-                    <!--android:layout_height="30dp"-->
-                    <!--android:src="@drawable/ac"-->
-                    <!--app:civ_border_width="2dp"-->
-                    <!--app:civ_border_color="#FF000000"/>-->
+                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                <!--android:layout_width="30dp"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:src="@drawable/ac"-->
+                <!--app:civ_border_width="2dp"-->
+                <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
                     android:layout_width="30dp"
@@ -175,41 +174,41 @@
                     android:src="@drawable/ac" />
 
                 <TextView
-                    android:paddingTop="3dp"
-                    android:text="AC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:text="AC" />
 
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/volvo"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="90dp"
-                android:padding="5dp"
-                android:orientation="vertical">
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/volvo_eta"
-                    android:paddingBottom="3dp"
-                    android:text="---"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:paddingBottom="3dp"
+                    android:text="---" />
 
                 <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="30dp"-->
-                    <!--android:layout_height="30dp"-->
-                    <!--android:src="@drawable/volvo"-->
-                    <!--app:civ_border_width="2dp"-->
-                    <!--app:civ_border_color="#FF000000"/>-->
+                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                <!--android:layout_width="30dp"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:src="@drawable/volvo"-->
+                <!--app:civ_border_width="2dp"-->
+                <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
                     android:layout_width="30dp"
@@ -217,43 +216,43 @@
                     android:src="@drawable/volvo" />
 
                 <TextView
-                    android:paddingTop="3dp"
-                    android:text="VOLVO"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:text="VOLVO" />
 
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:weightSum="2"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <Button
                 android:id="@+id/book_now"
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:text="GoTo Now"
+                android:layout_weight="1"
                 android:background="@drawable/orange_rect_button"
-                android:textColor="#FFF"/>
+                android:text="GoTo Now"
+                android:textColor="#FFF" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="40dp"
-                android:background="#FFF"/>
+                android:background="#FFF" />
 
             <Button
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:text="View More"
+                android:layout_weight="1"
                 android:background="@drawable/orange_rect_button"
-                android:textColor="#FFF"/>
+                android:text="View More"
+                android:textColor="#FFF" />
 
         </LinearLayout>
 

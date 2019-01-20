@@ -97,24 +97,22 @@ public class BookBusActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray result = response.getJSONArray("routes");
-                            if (result.length()>0) {
+                            if (result.length() > 0) {
                                 JSONObject route = result.getJSONObject(0);
                                 JSONArray legs = route.getJSONArray("legs");
 
-                                if (legs.length()>0) {
+                                if (legs.length() > 0) {
 //                                    String eta = legs.getJSONObject(0).getJSONObject("duration").get("text").toString();
                                     int etaValue = Integer.parseInt(legs.getJSONObject(0).getJSONObject("duration").get("value").toString());
                                     calendar.add(Calendar.SECOND, etaValue);
 
                                     arrivalTime.setText(calendar.getTime().toLocaleString());
-                                }
-                                else {
+                                } else {
                                     Toast.makeText(getApplicationContext(), "Unable to calculate ETA", Toast.LENGTH_LONG).show();
                                 }
 
                             }
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
 
                         }
                     }

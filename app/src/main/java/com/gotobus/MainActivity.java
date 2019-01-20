@@ -91,12 +91,12 @@ public class MainActivity extends AppCompatActivity
 
     MarkerOptions sourceMarkerOption, destinationMarkerOption, busMarker;
     String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
-    String pickupAddress="Pickup point";
-    String dropAddress="Drop-off point";
-    String [] busSource;
+    String pickupAddress = "Pickup point";
+    String dropAddress = "Drop-off point";
+    String[] busSource;
     String[] busDestination;
 
-    int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION=2 ;
+    int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION = 2;
 
     EditText sourceAddress, destinationAddress;
 
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
     String accessToken;
     SharedPreferences.Editor editor;
 
-    String eta="";
+    String eta = "";
     int etaValue = 0;
     TextView sleeperETA, acETA, volvoETA;
 
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        progressDialog=new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Fetching routes...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);
@@ -214,7 +214,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
 
 
         destinationAddress.setOnClickListener(new View.OnClickListener() {
@@ -254,10 +253,9 @@ public class MainActivity extends AppCompatActivity
         sleeper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
+                if (sourceMarkerOption != null && destinationMarkerOption != null) {
                     searchBus("Sleeper", true);
-                }
-                else {
+                } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
                 }
             }
@@ -266,10 +264,9 @@ public class MainActivity extends AppCompatActivity
         ac.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
-                    searchBus("AC",true);
-                }
-                else {
+                if (sourceMarkerOption != null && destinationMarkerOption != null) {
+                    searchBus("AC", true);
+                } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
                 }
             }
@@ -278,10 +275,9 @@ public class MainActivity extends AppCompatActivity
         volvo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (sourceMarkerOption!=null && destinationMarkerOption!=null) {
+                if (sourceMarkerOption != null && destinationMarkerOption != null) {
                     searchBus("Volvo", true);
-                }
-                else {
+                } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
                 }
             }
@@ -309,10 +305,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void searchBus(final String busType, final boolean buildRoute) {
-        if(!buildRoute) {
+        if (!buildRoute) {
             progressDialog.setMessage("Fetching ETA...");
-        }
-        else {
+        } else {
             progressDialog.setMessage("Fetching routes...");
         }
         progressDialog.show();
@@ -470,30 +465,26 @@ public class MainActivity extends AppCompatActivity
                                             public void onResponse(JSONObject response) {
                                                 try {
                                                     JSONArray result = response.getJSONArray("routes");
-                                                    if (result.length()>0) {
+                                                    if (result.length() > 0) {
                                                         JSONObject route = result.getJSONObject(0);
                                                         JSONArray legs = route.getJSONArray("legs");
 
-                                                        if (legs.length()>0) {
+                                                        if (legs.length() > 0) {
                                                             eta = legs.getJSONObject(0).getJSONObject("duration").get("text").toString();
                                                             etaValue = Integer.parseInt(legs.getJSONObject(0).getJSONObject("duration").get("value").toString());
                                                             if (busType.equals("Sleeper")) {
                                                                 sleeperETA.setText(eta);
-                                                            }
-                                                            else if (busType.equals("AC")) {
+                                                            } else if (busType.equals("AC")) {
                                                                 acETA.setText(eta);
-                                                            }
-                                                            else if (busType.equals("Volvo")) {
+                                                            } else if (busType.equals("Volvo")) {
                                                                 volvoETA.setText(eta);
                                                             }
-                                                        }
-                                                        else {
+                                                        } else {
                                                             Toast.makeText(getApplicationContext(), "Unable to calculate ETA", Toast.LENGTH_LONG).show();
                                                         }
 
                                                     }
-                                                }
-                                                catch (Exception e) {
+                                                } catch (Exception e) {
 
                                                 }
                                             }
@@ -505,8 +496,7 @@ public class MainActivity extends AppCompatActivity
                                         });
 
                             }
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
 
                         }
                     }
@@ -540,7 +530,7 @@ public class MainActivity extends AppCompatActivity
 
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                if (destinationMarkerOption!=null) {
+                if (destinationMarkerOption != null) {
                     mMap.addMarker(destinationMarkerOption);
                     searchBus("Sleeper", false);
                     searchBus("AC", false);
@@ -560,8 +550,7 @@ public class MainActivity extends AppCompatActivity
 //                    }
                 }
             }
-        }
-        else if (requestCode == AUTOCOMPLETE_DESTINATION) {
+        } else if (requestCode == AUTOCOMPLETE_DESTINATION) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(getApplicationContext(), data);
                 destinationAddress.setText(place.getAddress());
@@ -574,7 +563,7 @@ public class MainActivity extends AppCompatActivity
 
                 mMap.addMarker(destinationMarkerOption);
 
-                if (sourceMarkerOption!=null) {
+                if (sourceMarkerOption != null) {
                     mMap.addMarker(sourceMarkerOption);
                     searchBus("Sleeper", false);
                     searchBus("AC", false);
@@ -669,7 +658,7 @@ public class MainActivity extends AppCompatActivity
 //        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
 
         mMap.setBuildingsEnabled(true);
-        
+
         // Prompt the user for permission.
         getLocationPermission();
         updateLocationUI();
@@ -720,7 +709,7 @@ public class MainActivity extends AppCompatActivity
                 mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {
-                        if (sourceAddress.getText().toString().length()==0) {
+                        if (sourceAddress.getText().toString().length() == 0) {
                             Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                             try {
                                 List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
@@ -742,7 +731,7 @@ public class MainActivity extends AppCompatActivity
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -768,13 +757,12 @@ public class MainActivity extends AppCompatActivity
                                             mLastKnownLocation
                                                     .getLongitude()), DEFAULT_ZOOM));
                             Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                            try{
+                            try {
                                 List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
                                 Address address = addresses.get(0);
                                 String currentAddress = address.getAddressLine(0);
                                 sourceAddress.setText(currentAddress);
-                            }
-                            catch (Exception e) {
+                            } catch (Exception e) {
                                 Log.e("Exception", e.getMessage());
                             }
                         } else {
@@ -785,16 +773,18 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
     private class DownloadTask extends AsyncTask<String, Void, String> {
         String lineColor;
-        public  DownloadTask (String lineColor) {
+
+        public DownloadTask(String lineColor) {
             this.lineColor = lineColor;
         }
+
         @Override
         protected String doInBackground(String... url) {
 
@@ -825,9 +815,11 @@ public class MainActivity extends AppCompatActivity
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         String lineColor;
-        public  ParserTask (String lineColor) {
+
+        public ParserTask(String lineColor) {
             this.lineColor = lineColor;
         }
+
         // Parsing the data in non-ui thread
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
@@ -878,8 +870,7 @@ public class MainActivity extends AppCompatActivity
 // Drawing polyline in the Google Map for the i-th route
             try {
                 mMap.addPolyline(lineOptions);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.d("Polyline", e.getMessage());
             }
         }
