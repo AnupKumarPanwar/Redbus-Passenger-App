@@ -348,7 +348,6 @@ public class MainActivity extends AppCompatActivity
                                 busDestination = route.get("destinationLatLong").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
                                 LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
-                                origin = sourceMarkerOption.getPosition();
                                 setETA(busId, origin, busType);
 
                                 if (buildRoute) {
@@ -358,6 +357,7 @@ public class MainActivity extends AppCompatActivity
                                     DownloadTask downloadTask = new DownloadTask(lineColor);
                                     downloadTask.execute(url);
 
+                                    origin = sourceMarkerOption.getPosition();
                                     dest = new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong));
                                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                                     try {
