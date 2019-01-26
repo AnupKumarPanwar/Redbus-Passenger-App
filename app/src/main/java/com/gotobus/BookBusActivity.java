@@ -1,16 +1,22 @@
 package com.gotobus;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,17 +31,38 @@ public class BookBusActivity extends AppCompatActivity {
 
     TextView name, number, phone, arrivalTime, departureTime, pickupAddress, dropAddress, price;
     Button confirmBooking;
-    String busId;
+    String busId, routeId;
     int eta = 0;
 
     String source = "", destinataion = "";
     Calendar calendar;
+    String baseUrl;
+
+    SharedPreferences sharedPreferences;
+    String PREFS_NAME = "MyApp_Settings";
+    String accessToken;
+    SharedPreferences.Editor editor;
+    ProgressDialog progressDialog;
+    String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_bus);
+
+        baseUrl = getResources().getString(R.string.base_url);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        accessToken = sharedPreferences.getString("access_token", null);
+
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Booking bus...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setProgress(0);
+        progressDialog.setCancelable(false);
 
         name = findViewById(R.id.name);
         number = findViewById(R.id.bus_number);
@@ -44,6 +71,56 @@ public class BookBusActivity extends AppCompatActivity {
         departureTime = findViewById(R.id.departure_time);
         pickupAddress = findViewById(R.id.source);
         dropAddress = findViewById(R.id.destination);
+        confirmBooking = findViewById(R.id.book_confirm);
+
+        confirmBooking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressDialog.show();
+                AndroidNetworking.post(baseUrl + "/bookBus.php")
+                        .setOkHttpClient(NetworkCookies.okHttpClient)
+                        .addHeaders("Authorization", accessToken)
+                        .addBodyParameter("source", nearestSourceLat + "," + nearestSourceLong)
+                        .addBodyParameter("destination", nearestDestinationLat + "," + nearestDestinationLong)
+                        .addBodyParameter("route_id", routeId)
+                        .addBodyParameter("bus_id", busId)
+                        .setPriority(Priority.MEDIUM)
+                        .build()
+                        .getAsJSONObject(new JSONObjectRequestListener() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    JSONObject result = response.getJSONObject("result");
+                                    boolean success = Boolean.parseBoolean(result.get("success").toString());
+                                    if (success) {
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        progressDialog.hide();
+                                        String message = result.get("message").toString();
+                                        if (message.equals("Invalid access token.")) {
+                                            editor.putString("access_token", null);
+                                            editor.commit();
+                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                    }
+                                } catch (Exception e) {
+                                    Log.e("Exception", e.getMessage());
+                                }
+                            }
+
+                            @Override
+                            public void onError(ANError anError) {
+
+                            }
+                        });
+            }
+        });
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd:hh:mm aa");
         String currentDateandTime = sdf.format(new Date());
@@ -61,6 +138,10 @@ public class BookBusActivity extends AppCompatActivity {
             destinataion = data.getString("destination");
             dropAddress.setText(destinataion);
             eta = data.getInt("eta");
+            nearestSourceLat = data.getString("nearestSourceLat");
+            nearestSourceLong = data.getString("nearestSourceLong");
+            nearestDestinationLat = data.getString("nearestDestinationLat");
+            nearestDestinationLong = data.getString("nearestDestinationLong");
 
 
             try {
@@ -80,6 +161,7 @@ public class BookBusActivity extends AppCompatActivity {
 
 
             busId = data.getString("bus_id");
+            routeId = data.getString("route_id");
         }
 
         setETA(source, destinataion, "");

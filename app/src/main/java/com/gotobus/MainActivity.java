@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity
 
     MarkerOptions sourceMarkerOption, destinationMarkerOption, busMarker;
     String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
+    MarkerOptions nearestSourceOption, nearestDestinationOption;
     String pickupAddress = "Pickup point";
     String dropAddress = "Drop-off point";
     String[] busSource;
@@ -101,14 +102,14 @@ public class MainActivity extends AppCompatActivity
 
     EditText sourceAddress, destinationAddress;
 
-    LinearLayout container, sleeper, ac, volvo;
+    LinearLayout container, sleeper, ac, volvo, busInfo, bookingOptions;
     String baseUrl;
 
     String lineColor = "#0fa4e6";
 
     Button bookNow;
 
-    String busName = "", busNumber = "", busPhone = "", busId = "";
+    String busName = "", busNumber = "", busPhone = "", busId = "", routeId = "", busType = "";
 
     SharedPreferences sharedPreferences;
     String PREFS_NAME = "MyApp_Settings";
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity
     Runnable getBusLocationRunnable;
     boolean tripCompleted = false;
     Marker currentBusMarker;
+    boolean busSelected = false;
 
 
     @Override
@@ -160,6 +162,8 @@ public class MainActivity extends AppCompatActivity
 
         container = findViewById(R.id.container);
         container.requestFocus();
+        busInfo = findViewById(R.id.bus_info);
+        bookingOptions = findViewById(R.id.booking_options);
 
         sleeperETA = findViewById(R.id.sleeper_eta);
         acETA = findViewById(R.id.ac_eta);
@@ -179,18 +183,37 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
+
         bookNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), BookBusActivity.class);
-                intent.putExtra("name", busName);
-                intent.putExtra("bus_number", busNumber);
-                intent.putExtra("phone", busPhone);
-                intent.putExtra("source", pickupAddress);
-                intent.putExtra("destination", dropAddress);
-                intent.putExtra("bus_id", busId);
-                intent.putExtra("eta", etaValue);
-                startActivity(intent);
+                if (!routeId.equals("") && busSelected) {
+
+                    editor.putString("source", sourceMarkerOption.getPosition().latitude+","+sourceMarkerOption.getPosition().longitude);
+                    editor.putString("destination", destinationMarkerOption.getPosition().latitude+","+destinationMarkerOption.getPosition().longitude);
+
+                    editor.putString("source_address", sourceAddress.getText().toString());
+                    editor.putString("destination_address", destinationAddress.getText().toString());
+
+                    editor.commit();
+
+                    Intent intent = new Intent(getApplicationContext(), BookBusActivity.class);
+                    intent.putExtra("name", busName);
+                    intent.putExtra("bus_number", busNumber);
+                    intent.putExtra("phone", busPhone);
+                    intent.putExtra("source", pickupAddress);
+                    intent.putExtra("destination", dropAddress);
+                    intent.putExtra("bus_id", busId);
+                    intent.putExtra("route_id", routeId);
+                    intent.putExtra("eta", etaValue);
+                    intent.putExtra("nearestSourceLat", nearestSourceLat);
+                    intent.putExtra("nearestSourceLong", nearestSourceLong);
+                    intent.putExtra("nearestDestinationLat", nearestDestinationLat);
+                    intent.putExtra("nearestDestinationLong", nearestDestinationLong);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please select a bus first", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -338,7 +361,7 @@ public class MainActivity extends AppCompatActivity
                                 String[] busLocation = data.get("last_location").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
                                 float bearing = Float.parseFloat(data.get("bearing").toString());
-                                String busType = data.get("bus_type").toString();
+                                busType = data.get("bus_type").toString();
 //                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
                                 if (busType.equals("Sleeper")) {
                                     busMarker = new MarkerOptions()
@@ -359,7 +382,7 @@ public class MainActivity extends AppCompatActivity
                                             .rotation(bearing)
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
                                 }
-                                if (currentBusMarker!=null) {
+                                if (currentBusMarker != null) {
                                     currentBusMarker.remove();
                                 }
                                 currentBusMarker = mMap.addMarker(busMarker);
@@ -378,6 +401,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void searchBus(final String busType, final boolean buildRoute) {
+        searchBus(busType, buildRoute, false);
+    }
+
+    private void searchBus(final String busType, final boolean buildRoute, final boolean booked) {
         if (!buildRoute) {
             progressDialog.setMessage("Fetching ETA...");
         } else {
@@ -385,9 +412,35 @@ public class MainActivity extends AppCompatActivity
         }
         progressDialog.show();
         mMap.clear();
+        String url = "";
+        if (booked) {
+            url = baseUrl + "/checkBooking.php";
+            String[] source = sharedPreferences.getString("source","").split(",");
+            String[] destination = sharedPreferences.getString("destination","").split(",");
+
+            sourceAddress.setText(sharedPreferences.getString("source_address", ""));
+            destinationAddress.setText(sharedPreferences.getString("destination_address", ""));
+
+            sourceAddress.setEnabled(false);
+            destinationAddress.setEnabled(false);
+            if (sourceMarkerOption==null) {
+                sourceMarkerOption = new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(source[0]), Double.parseDouble(source[1])))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
+            }
+            if (destinationMarkerOption ==null) {
+                destinationMarkerOption = new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(destination[0]), Double.parseDouble(destination[1])))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
+            }
+        }
+        else {
+            url = baseUrl + "/search.php";
+        }
         mMap.addMarker(sourceMarkerOption);
         mMap.addMarker(destinationMarkerOption);
-        AndroidNetworking.post(baseUrl + "/search.php")
+
+        AndroidNetworking.post(url)
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
                 .addBodyParameter("slat", String.valueOf(sourceMarkerOption.getPosition().latitude))
@@ -412,6 +465,7 @@ public class MainActivity extends AppCompatActivity
                                 nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
                                 String waypoints = "";
                                 JSONObject route = data.getJSONObject("route");
+                                routeId = route.get("id").toString();
                                 busId = route.get("bus_id").toString();
                                 busName = route.get("name").toString();
                                 busPhone = route.get("phone").toString();
@@ -421,11 +475,17 @@ public class MainActivity extends AppCompatActivity
                                 busDestination = route.get("destinationLatLong").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
                                 LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
-                                setETA(busId, origin, busType);
+                                if (!booked) {
+                                    setETA(busId, origin, busType);
+                                }
 
                                 if (buildRoute) {
+                                    progressDialog.hide();
+                                    busSelected = true;
                                     mMap.clear();
-                                    handler.postDelayed(getBusLocationRunnable, 12000);
+                                    mMap.addMarker(sourceMarkerOption);
+                                    mMap.addMarker(destinationMarkerOption);
+//                                    handler.postDelayed(getBusLocationRunnable, 12000);
 
                                     lineColor = "#0fa4e6";
                                     String url = getDirectionsUrl(origin, dest, waypoints);
@@ -442,7 +502,7 @@ public class MainActivity extends AppCompatActivity
                                     } catch (Exception e) {
                                         Log.e("Exception", e.getMessage());
                                     }
-                                    MarkerOptions nearestSourceOption = new MarkerOptions()
+                                    nearestSourceOption = new MarkerOptions()
                                             .title(pickupAddress)
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
                                             .position(dest);
@@ -463,7 +523,7 @@ public class MainActivity extends AppCompatActivity
                                     } catch (Exception e) {
                                         Log.e("Exception", e.getMessage());
                                     }
-                                    MarkerOptions nearestDestinationOption = new MarkerOptions()
+                                    nearestDestinationOption = new MarkerOptions()
                                             .title(dropAddress)
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
                                             .position(origin);
@@ -473,6 +533,11 @@ public class MainActivity extends AppCompatActivity
                                     String url2 = getDirectionsUrl(origin, dest, waypoints);
                                     DownloadTask downloadTask2 = new DownloadTask(lineColor);
                                     downloadTask2.execute(url2);
+                                }
+                                if (booked) {
+                                    bookingOptions.setVisibility(View.GONE);
+                                    busInfo.setVisibility(View.VISIBLE);
+                                    handler.postDelayed(getBusLocationRunnable, 1000);
                                 }
 
                             } else {
@@ -486,12 +551,17 @@ public class MainActivity extends AppCompatActivity
                                     finish();
                                 }
                                 if (buildRoute) {
-                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                    editor.putString("source", null);
+                                    editor.putString("destination", null);
+                                    editor.commit();
+                                    if (!booked) {
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                    }
                                 }
                             }
                         } catch (JSONException e) {
                             progressDialog.hide();
-                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -585,6 +655,18 @@ public class MainActivity extends AppCompatActivity
                                         });
 
                             }
+                            else {
+                                String message = result.get("message").toString();
+                                if (message.equals("Invalid access token.")) {
+                                    editor.putString("access_token", null);
+                                    editor.commit();
+                                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                            }
+
                         } catch (Exception e) {
 
                         }
@@ -601,6 +683,7 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == AUTOCOMPLETE_SOURCE) {
             if (resultCode == RESULT_OK) {
+                busSelected = false;
                 Place place = PlacePicker.getPlace(getApplicationContext(), data);
                 sourceAddress.setText(place.getAddress());
 
@@ -641,6 +724,7 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (requestCode == AUTOCOMPLETE_DESTINATION) {
             if (resultCode == RESULT_OK) {
+                busSelected = false;
                 Place place = PlacePicker.getPlace(getApplicationContext(), data);
                 destinationAddress.setText(place.getAddress());
 
@@ -752,6 +836,9 @@ public class MainActivity extends AppCompatActivity
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
+        if (sharedPreferences.getString("source", null) !=null) {
+            searchBus(busType, true, true);
+        }
 
 //        // Add a marker in Sydney and move the camera
 //        LatLng sydney = new LatLng(-34, 151);
