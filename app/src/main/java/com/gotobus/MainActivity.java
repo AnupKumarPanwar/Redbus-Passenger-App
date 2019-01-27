@@ -421,8 +421,6 @@ public class MainActivity extends AppCompatActivity
             sourceAddress.setText(sharedPreferences.getString("source_address", ""));
             destinationAddress.setText(sharedPreferences.getString("destination_address", ""));
 
-            sourceAddress.setEnabled(false);
-            destinationAddress.setEnabled(false);
             if (sourceMarkerOption==null) {
                 sourceMarkerOption = new MarkerOptions()
                         .position(new LatLng(Double.parseDouble(source[0]), Double.parseDouble(source[1])))
@@ -535,6 +533,8 @@ public class MainActivity extends AppCompatActivity
                                     downloadTask2.execute(url2);
                                 }
                                 if (booked) {
+                                    sourceAddress.setEnabled(false);
+                                    destinationAddress.setEnabled(false);
                                     bookingOptions.setVisibility(View.GONE);
                                     busInfo.setVisibility(View.VISIBLE);
                                     handler.postDelayed(getBusLocationRunnable, 1000);
