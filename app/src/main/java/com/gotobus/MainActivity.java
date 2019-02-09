@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
 //                getBusLocation(busId);
-                setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType);
+                setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType, true);
                 if (!tripCompleted) {
                     handler.postDelayed(this, 120000);
                 }
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                cancelBus();
+                                cancelBooking();
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void cancelBus() {
+    private void cancelBooking() {
         progressDialog.setMessage("Cancelling...");
         progressDialog.show();
         AndroidNetworking.post(baseUrl + "/cancelBooking.php")
@@ -398,6 +398,9 @@ public class MainActivity extends AppCompatActivity
                                 bookingOptions.setVisibility(View.VISIBLE);
                                 busInfo.setVisibility(View.GONE);
                                 tripCompleted=true;
+                                editor.putString("source", null);
+                                editor.putString("destination", null);
+                                editor.commit();
                             }
                             progressDialog.hide();
                         } catch (Exception e) {
@@ -542,7 +545,7 @@ public class MainActivity extends AppCompatActivity
                                 LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
                                 LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
                                 if (!booked) {
-                                    setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType);
+                                    setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType, false);
                                 }
 
                                 if (buildRoute) {
@@ -657,7 +660,7 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void setETA(String busId, final LatLng dest, final String busTypePassed) {
+    private void setETA(String busId, final LatLng dest, final String busTypePassed, final boolean booked) {
         AndroidNetworking.post(baseUrl + "/getBusLocation.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
@@ -698,7 +701,12 @@ public class MainActivity extends AppCompatActivity
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
                                 }
 
-                                mMap.addMarker(busMarker);
+                                if (booked) {
+                                    if (currentBusMarker != null) {
+                                        currentBusMarker.remove();
+                                    }
+                                }
+                                currentBusMarker = mMap.addMarker(busMarker);
 
                                 String url = getDirectionsUrl(origin, dest, "");
 
