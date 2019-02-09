@@ -94,6 +94,7 @@ public class BookBusActivity extends AppCompatActivity {
                                     boolean success = Boolean.parseBoolean(result.get("success").toString());
                                     if (success) {
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
                                         finish();
                                     } else {
@@ -103,6 +104,7 @@ public class BookBusActivity extends AppCompatActivity {
                                             editor.putString("access_token", null);
                                             editor.commit();
                                             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             startActivity(intent);
                                             finish();
                                         }
@@ -233,6 +235,18 @@ public class BookBusActivity extends AppCompatActivity {
 
 
         return url;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }
 

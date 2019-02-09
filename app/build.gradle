@@ -6,10 +6,22 @@ android {
         applicationId "in.gotobus"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.2b"
+        versionCode 4
+        versionName "1.3b"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == "com.android.support") {
+                if (!requested.name.startsWith("multidex")) {
+                    details.useVersion "26.+"
+                }
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

@@ -1,6 +1,9 @@
 package com.gotobus;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -8,6 +11,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,8 +83,8 @@ public class MainActivity extends AppCompatActivity
 
     private final LatLng mDefaultLocation = new LatLng(28.7041, 77.1025);
     private static final int DEFAULT_ZOOM = 15;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean mLocationPermissionGranted;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1, PERMISSION_REQUEST_PHONE_CALL = 2;
+    private boolean mLocationPermissionGranted, mCallPermissionGranted;
 
     private Location mLastKnownLocation;
 
@@ -118,7 +123,7 @@ public class MainActivity extends AppCompatActivity
 
     String eta = "";
     int etaValue = 0;
-    TextView sleeperETA, acETA, volvoETA;
+    TextView sleeperETA, acETA, volvoETA, cancelBus;
 
     ProgressDialog progressDialog;
     Handler handler;
@@ -126,6 +131,9 @@ public class MainActivity extends AppCompatActivity
     boolean tripCompleted = false;
     Marker currentBusMarker;
     boolean busSelected = false;
+
+    TextView busNameView, busNumberView, fareView, otpView, etaView;
+    ImageView callBus;
 
 
     @Override
@@ -171,26 +179,52 @@ public class MainActivity extends AppCompatActivity
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
         bookNow = findViewById(R.id.book_now);
+        busNameView = findViewById(R.id.bus_name);
+        busNumberView = findViewById(R.id.bus_number);
+        fareView = findViewById(R.id.fare);
+        otpView = findViewById(R.id.otp);
+        etaView = findViewById(R.id.booked_bus_eta);
+        callBus = findViewById(R.id.call_bus);
+        cancelBus = findViewById(R.id.cancel);
 
         handler = new Handler();
         getBusLocationRunnable = new Runnable() {
             @Override
             public void run() {
-                getBusLocation(busId);
+//                getBusLocation(busId);
+                setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType);
                 if (!tripCompleted) {
-                    handler.postDelayed(this, 12000);
+                    handler.postDelayed(this, 120000);
                 }
             }
         };
 
+
+        cancelBus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Cancel booking?")
+                        .setMessage("Are you sure you want to cancel this booking?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                cancelBus();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
+
+            }
+        });
 
         bookNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!routeId.equals("") && busSelected) {
 
-                    editor.putString("source", sourceMarkerOption.getPosition().latitude+","+sourceMarkerOption.getPosition().longitude);
-                    editor.putString("destination", destinationMarkerOption.getPosition().latitude+","+destinationMarkerOption.getPosition().longitude);
+                    editor.putString("source", sourceMarkerOption.getPosition().latitude + "," + sourceMarkerOption.getPosition().longitude);
+                    editor.putString("destination", destinationMarkerOption.getPosition().latitude + "," + destinationMarkerOption.getPosition().longitude);
 
                     editor.putString("source_address", sourceAddress.getText().toString());
                     editor.putString("destination_address", destinationAddress.getText().toString());
@@ -343,62 +377,97 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void getBusLocation(String busId) {
-        AndroidNetworking.post(baseUrl + "/getBusLocation.php")
+    private void cancelBus() {
+        progressDialog.setMessage("Cancelling...");
+        progressDialog.show();
+        AndroidNetworking.post(baseUrl + "/cancelBooking.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
-                .addBodyParameter("id", busId)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
+
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
                             JSONObject result = response.getJSONObject("result");
                             boolean success = Boolean.parseBoolean(result.get("success").toString());
                             if (success) {
-                                JSONObject data = result.getJSONObject("data");
-                                String[] busLocation = data.get("last_location").toString().split(",");
-                                LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
-                                float bearing = Float.parseFloat(data.get("bearing").toString());
-                                busType = data.get("bus_type").toString();
-//                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
-                                if (busType.equals("Sleeper")) {
-                                    busMarker = new MarkerOptions()
-                                            .position(origin)
-                                            .flat(true)
-                                            .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
-                                } else if (busType.equals("AC")) {
-                                    busMarker = new MarkerOptions()
-                                            .position(origin)
-                                            .flat(true)
-                                            .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
-                                } else if (busType.equals("Volvo")) {
-                                    busMarker = new MarkerOptions()
-                                            .position(origin)
-                                            .flat(true)
-                                            .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
-                                }
-                                if (currentBusMarker != null) {
-                                    currentBusMarker.remove();
-                                }
-                                currentBusMarker = mMap.addMarker(busMarker);
+                                sourceAddress.setEnabled(true);
+                                destinationAddress.setEnabled(true);
+                                bookingOptions.setVisibility(View.VISIBLE);
+                                busInfo.setVisibility(View.GONE);
+                                tripCompleted=true;
                             }
+                            progressDialog.hide();
                         } catch (Exception e) {
-
+                            progressDialog.hide();
                         }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-
+                        progressDialog.hide();
                     }
                 });
-
     }
+
+//    private void getBusLocation(final String busId) {
+//        AndroidNetworking.post(baseUrl + "/getBusLocation.php")
+//                .setOkHttpClient(NetworkCookies.okHttpClient)
+//                .addHeaders("Authorization", accessToken)
+//                .addBodyParameter("id", busId)
+//                .setPriority(Priority.MEDIUM)
+//                .build()
+//                .getAsJSONObject(new JSONObjectRequestListener() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            JSONObject result = response.getJSONObject("result");
+//                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+//                            if (success) {
+//                                JSONObject data = result.getJSONObject("data");
+//                                String[] busLocation = data.get("last_location").toString().split(",");
+//                                LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
+//                                float bearing = Float.parseFloat(data.get("bearing").toString());
+//                                busType = data.get("bus_type").toString();
+////                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
+//                                if (busType.equals("Sleeper")) {
+//                                    busMarker = new MarkerOptions()
+//                                            .position(origin)
+//                                            .flat(true)
+//                                            .rotation(bearing)
+//                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+//                                } else if (busType.equals("AC")) {
+//                                    busMarker = new MarkerOptions()
+//                                            .position(origin)
+//                                            .flat(true)
+//                                            .rotation(bearing)
+//                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
+//                                } else if (busType.equals("Volvo")) {
+//                                    busMarker = new MarkerOptions()
+//                                            .position(origin)
+//                                            .flat(true)
+//                                            .rotation(bearing)
+//                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
+//                                }
+//                                if (currentBusMarker != null) {
+//                                    currentBusMarker.remove();
+//                                }
+//                                currentBusMarker = mMap.addMarker(busMarker);
+//                            }
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(ANError anError) {
+//
+//                    }
+//                });
+//
+//    }
 
     private void searchBus(final String busType, final boolean buildRoute) {
         searchBus(busType, buildRoute, false);
@@ -415,24 +484,23 @@ public class MainActivity extends AppCompatActivity
         String url = "";
         if (booked) {
             url = baseUrl + "/checkBooking.php";
-            String[] source = sharedPreferences.getString("source","").split(",");
-            String[] destination = sharedPreferences.getString("destination","").split(",");
+            String[] source = sharedPreferences.getString("source", "").split(",");
+            String[] destination = sharedPreferences.getString("destination", "").split(",");
 
             sourceAddress.setText(sharedPreferences.getString("source_address", ""));
             destinationAddress.setText(sharedPreferences.getString("destination_address", ""));
 
-            if (sourceMarkerOption==null) {
+            if (sourceMarkerOption == null) {
                 sourceMarkerOption = new MarkerOptions()
                         .position(new LatLng(Double.parseDouble(source[0]), Double.parseDouble(source[1])))
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
             }
-            if (destinationMarkerOption ==null) {
+            if (destinationMarkerOption == null) {
                 destinationMarkerOption = new MarkerOptions()
                         .position(new LatLng(Double.parseDouble(destination[0]), Double.parseDouble(destination[1])))
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
             }
-        }
-        else {
+        } else {
             url = baseUrl + "/search.php";
         }
         mMap.addMarker(sourceMarkerOption);
@@ -474,7 +542,7 @@ public class MainActivity extends AppCompatActivity
                                 LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
                                 LatLng dest = new LatLng(Double.parseDouble(busDestination[0]), Double.parseDouble(busDestination[1]));
                                 if (!booked) {
-                                    setETA(busId, origin, busType);
+                                    setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType);
                                 }
 
                                 if (buildRoute) {
@@ -533,6 +601,22 @@ public class MainActivity extends AppCompatActivity
                                     downloadTask2.execute(url2);
                                 }
                                 if (booked) {
+                                    busNameView.setText(busName);
+                                    busNumberView.setText(busNumber);
+                                    fareView.setText("Rs. 500");
+                                    otpView.setText("OTP : 9876");
+                                    callBus.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent intent = new Intent(Intent.ACTION_CALL);
+                                            intent.setData(Uri.parse("tel:" + busPhone));
+                                            if (mCallPermissionGranted) {
+                                                startActivity(intent);
+                                            } else {
+                                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE}, PERMISSION_REQUEST_PHONE_CALL);
+                                            }
+                                        }
+                                    });
                                     sourceAddress.setEnabled(false);
                                     destinationAddress.setEnabled(false);
                                     bookingOptions.setVisibility(View.GONE);
@@ -551,13 +635,13 @@ public class MainActivity extends AppCompatActivity
                                     finish();
                                 }
                                 if (buildRoute) {
-                                    editor.putString("source", null);
-                                    editor.putString("destination", null);
-                                    editor.commit();
                                     if (!booked) {
                                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     }
                                 }
+                                editor.putString("source", null);
+                                editor.putString("destination", null);
+                                editor.commit();
                             }
                         } catch (JSONException e) {
                             progressDialog.hide();
@@ -573,7 +657,7 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void setETA(String busId, final LatLng dest, final String busType) {
+    private void setETA(String busId, final LatLng dest, final String busTypePassed) {
         AndroidNetworking.post(baseUrl + "/getBusLocation.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
@@ -589,8 +673,10 @@ public class MainActivity extends AppCompatActivity
                             boolean success = Boolean.parseBoolean(result.get("success").toString());
                             if (success) {
                                 JSONObject data = result.getJSONObject("data");
+                                busType = data.get("bus_type").toString();
                                 String[] busLocation = data.get("last_location").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
+//                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
                                 float bearing = Float.parseFloat(data.get("bearing").toString());
                                 if (busType.equals("Sleeper")) {
                                     busMarker = new MarkerOptions()
@@ -638,13 +724,19 @@ public class MainActivity extends AppCompatActivity
                                                             } else if (busType.equals("Volvo")) {
                                                                 volvoETA.setText(eta);
                                                             }
+//                                                            Toast.makeText(getApplicationContext(), String.valueOf(eta), Toast.LENGTH_LONG).show();
+
+//                                                            Log.d("route", String.valueOf(response));
+                                                            etaView.setText("ETA : " + eta);
+//                                                            Log.d("agla", "agla");
+
                                                         } else {
                                                             Toast.makeText(getApplicationContext(), "Unable to calculate ETA", Toast.LENGTH_LONG).show();
                                                         }
 
                                                     }
                                                 } catch (Exception e) {
-
+                                                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                                                 }
                                             }
 
@@ -654,8 +746,7 @@ public class MainActivity extends AppCompatActivity
                                             }
                                         });
 
-                            }
-                            else {
+                            } else {
                                 String message = result.get("message").toString();
                                 if (message.equals("Invalid access token.")) {
                                     editor.putString("access_token", null);
@@ -668,7 +759,7 @@ public class MainActivity extends AppCompatActivity
                             }
 
                         } catch (Exception e) {
-
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -836,7 +927,7 @@ public class MainActivity extends AppCompatActivity
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
-        if (sharedPreferences.getString("source", null) !=null) {
+        if (sharedPreferences.getString("source", null) != null) {
             searchBus(busType, true, true);
         }
 
@@ -861,12 +952,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
+        mCallPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                }
+                break;
+            }
+            case PERMISSION_REQUEST_PHONE_CALL: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mCallPermissionGranted = true;
                 }
             }
         }
@@ -1119,5 +1217,17 @@ public class MainActivity extends AppCompatActivity
             urlConnection.disconnect();
         }
         return data;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }
