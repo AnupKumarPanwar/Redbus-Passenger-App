@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
 
     Button bookNow;
 
-    String busName = "", busNumber = "", busPhone = "", busId = "", routeId = "", busType = "";
+    String busName = "", busNumber = "", busPhone = "", busId = "", routeId = "", busType = "", bookedBusType = "", otp = "", fare = "";
 
     SharedPreferences sharedPreferences;
     String PREFS_NAME = "MyApp_Settings";
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
 //                getBusLocation(busId);
-                setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), busType, true);
+                setETA(busId, new LatLng(Double.parseDouble(nearestSourceLat), Double.parseDouble(nearestSourceLong)), bookedBusType, true);
                 if (!tripCompleted) {
                     handler.postDelayed(this, 120000);
                 }
@@ -327,7 +327,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (sourceMarkerOption != null && destinationMarkerOption != null) {
-                    searchBus("Sleeper", true);
+                    if (sleeperETA.getText().equals("---")) {
+                        Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_LONG).show();
+                    } else {
+                        searchBus("Sleeper", true);
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
                 }
@@ -338,7 +342,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (sourceMarkerOption != null && destinationMarkerOption != null) {
-                    searchBus("AC", true);
+                    if (acETA.getText().equals("---")) {
+                        Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_LONG).show();
+                    } else {
+                        searchBus("AC", true);
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
                 }
@@ -349,7 +357,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (sourceMarkerOption != null && destinationMarkerOption != null) {
-                    searchBus("Volvo", true);
+                    if (volvoETA.getText().equals("---")) {
+                        Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_LONG).show();
+                    } else {
+                        searchBus("Volvo", true);
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
                 }
@@ -397,10 +409,16 @@ public class MainActivity extends AppCompatActivity
                                 destinationAddress.setEnabled(true);
                                 bookingOptions.setVisibility(View.VISIBLE);
                                 busInfo.setVisibility(View.GONE);
-                                tripCompleted=true;
+                                tripCompleted = true;
                                 editor.putString("source", null);
                                 editor.putString("destination", null);
                                 editor.commit();
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                String message = result.get("message").toString();
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
                             progressDialog.hide();
                         } catch (Exception e) {
@@ -533,6 +551,8 @@ public class MainActivity extends AppCompatActivity
                                 nearestDestinationLat = data.getJSONArray("nearestDestination").get(0).toString();
                                 nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
                                 String waypoints = "";
+                                otp = data.get("otp").toString();
+                                fare = data.get("fare").toString();
                                 JSONObject route = data.getJSONObject("route");
                                 routeId = route.get("id").toString();
                                 busId = route.get("bus_id").toString();
@@ -606,8 +626,8 @@ public class MainActivity extends AppCompatActivity
                                 if (booked) {
                                     busNameView.setText(busName);
                                     busNumberView.setText(busNumber);
-                                    fareView.setText("Rs. 500");
-                                    otpView.setText("OTP : 9876");
+                                    fareView.setText("Rs. " + fare);
+                                    otpView.setText("OTP : " + otp);
                                     callBus.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
@@ -660,7 +680,7 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void setETA(String busId, final LatLng dest, final String busTypePassed, final boolean booked) {
+    private void setETA(String busId, final LatLng dest, final String busType, final boolean booked) {
         AndroidNetworking.post(baseUrl + "/getBusLocation.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
@@ -676,7 +696,7 @@ public class MainActivity extends AppCompatActivity
                             boolean success = Boolean.parseBoolean(result.get("success").toString());
                             if (success) {
                                 JSONObject data = result.getJSONObject("data");
-                                busType = data.get("bus_type").toString();
+                                bookedBusType = data.get("bus_type").toString();
                                 String[] busLocation = data.get("last_location").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
 //                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
@@ -701,14 +721,19 @@ public class MainActivity extends AppCompatActivity
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
                                 }
 
+//                                Toast.makeText(getApplicationContext(), String.valueOf("test"), Toast.LENGTH_LONG).show();
+
                                 if (booked) {
                                     if (currentBusMarker != null) {
                                         currentBusMarker.remove();
                                     }
                                 }
-                                currentBusMarker = mMap.addMarker(busMarker);
+                                if (busMarker != null) {
+                                    currentBusMarker = mMap.addMarker(busMarker);
+                                }
 
                                 String url = getDirectionsUrl(origin, dest, "");
+
 
                                 AndroidNetworking.get(url)
                                         .setOkHttpClient(NetworkCookies.okHttpClient)
@@ -732,7 +757,6 @@ public class MainActivity extends AppCompatActivity
                                                             } else if (busType.equals("Volvo")) {
                                                                 volvoETA.setText(eta);
                                                             }
-//                                                            Toast.makeText(getApplicationContext(), String.valueOf(eta), Toast.LENGTH_LONG).show();
 
 //                                                            Log.d("route", String.valueOf(response));
                                                             etaView.setText("ETA : " + eta);
@@ -767,7 +791,7 @@ public class MainActivity extends AppCompatActivity
                             }
 
                         } catch (Exception e) {
-                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
 
