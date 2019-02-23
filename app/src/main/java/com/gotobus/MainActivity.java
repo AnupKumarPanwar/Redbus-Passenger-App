@@ -593,7 +593,7 @@ public class MainActivity extends AppCompatActivity
                                     }
                                     nearestSourceOption = new MarkerOptions()
                                             .title(pickupAddress)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pickup_marker))
                                             .position(dest);
                                     mMap.addMarker(nearestSourceOption);
                                     waypoints = "";
@@ -614,7 +614,7 @@ public class MainActivity extends AppCompatActivity
                                     }
                                     nearestDestinationOption = new MarkerOptions()
                                             .title(dropAddress)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.goto_bus_pin))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.dropoff_marker))
                                             .position(origin);
                                     mMap.addMarker(nearestDestinationOption);
                                     waypoints = "";
