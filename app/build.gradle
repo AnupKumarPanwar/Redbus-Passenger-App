@@ -6,8 +6,8 @@ android {
         applicationId "in.gotobus"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 4
-        versionName "1.3b"
+        versionCode 5
+        versionName "1.4b"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     

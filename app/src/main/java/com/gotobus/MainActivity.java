@@ -48,6 +48,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,6 +56,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -129,12 +131,12 @@ public class MainActivity extends AppCompatActivity
     Handler handler;
     Runnable getBusLocationRunnable;
     boolean tripCompleted = false;
-    Marker currentBusMarker;
+    Marker currentBusMarker, sourceMarker, destinationMarker;
     boolean busSelected = false;
 
     TextView busNameView, busNumberView, fareView, otpView, etaView;
     ImageView callBus;
-
+    Runnable adjustZoomLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +169,7 @@ public class MainActivity extends AppCompatActivity
         accessToken = sharedPreferences.getString("access_token", null);
 
         AndroidNetworking.initialize(getApplicationContext());
+
 
         container = findViewById(R.id.container);
         container.requestFocus();
@@ -368,6 +371,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+        adjustZoomLevel = new Runnable() {
+            @Override
+            public void run() {
+                searchBus("Sleeper", false);
+                searchBus("AC", false);
+                searchBus("Volvo", false);
+            }
+        };
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -827,9 +839,18 @@ public class MainActivity extends AppCompatActivity
 
                 if (destinationMarkerOption != null) {
                     mMap.addMarker(destinationMarkerOption);
-                    searchBus("Sleeper", false);
-                    searchBus("AC", false);
-                    searchBus("Volvo", false);
+
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                    builder.include(sourceMarkerOption.getPosition());
+                    builder.include(destinationMarkerOption.getPosition());
+
+                    LatLngBounds bounds = builder.build();
+                    int padding = 300; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    mMap.animateCamera(cu);
+
+                    handler.postDelayed(adjustZoomLevel, 1200);
 //                    // Getting URL to the Google Directions API
 //                    LatLng origin = sourceMarkerOption.getPosition();
 //                    LatLng dest = destinationMarkerOption.getPosition();
@@ -861,9 +882,19 @@ public class MainActivity extends AppCompatActivity
 
                 if (sourceMarkerOption != null) {
                     mMap.addMarker(sourceMarkerOption);
-                    searchBus("Sleeper", false);
-                    searchBus("AC", false);
-                    searchBus("Volvo", false);
+
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                    builder.include(sourceMarkerOption.getPosition());
+                    builder.include(destinationMarkerOption.getPosition());
+
+                    LatLngBounds bounds = builder.build();
+                    int padding = 300; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    mMap.animateCamera(cu);
+
+
+                    handler.postDelayed(adjustZoomLevel, 1200);
 //                    // Getting URL to the Google Directions API
 //                    LatLng origin = sourceMarkerOption.getPosition();
 //                    LatLng dest = destinationMarkerOption.getPosition();
@@ -881,6 +912,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
 
     @Override
     public void onBackPressed() {
@@ -935,7 +967,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.locate) {
 
-        }  else if (id == R.id.help) {
+        } else if (id == R.id.help) {
 
         } else if (id == R.id.share) {
 

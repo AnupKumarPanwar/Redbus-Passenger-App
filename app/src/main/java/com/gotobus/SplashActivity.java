@@ -110,7 +110,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
                 finish();
-                finish();
 //                Toast.makeText(getApplicationContext(), "GPS is not enabled", Toast.LENGTH_LONG).show();
             }
 
