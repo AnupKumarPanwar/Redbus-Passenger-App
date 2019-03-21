@@ -962,7 +962,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.profile) {
-            // Handle the camera action
+            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+            startActivity(intent);
         } else if (id == R.id.trips) {
 
         } else if (id == R.id.locate) {
