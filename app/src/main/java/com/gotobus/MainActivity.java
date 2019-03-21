@@ -965,7 +965,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
         } else if (id == R.id.trips) {
-
+            Intent intent = new Intent(getApplicationContext(), TripsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.locate) {
 
         } else if (id == R.id.help) {
