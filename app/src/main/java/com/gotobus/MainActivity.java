@@ -967,8 +967,14 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.trips) {
             Intent intent = new Intent(getApplicationContext(), TripsActivity.class);
             startActivity(intent);
-        } else if (id == R.id.locate) {
-
+        }
+//        else if (id == R.id.locate) {
+//            Intent intent = new Intent(getApplicationContext(), LocateActivity.class);
+//            startActivity(intent);
+//        }
+        else if (id == R.id.wallet) {
+            Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
+            startActivity(intent);
         } else if (id == R.id.help) {
 
         } else if (id == R.id.share) {
@@ -1062,6 +1068,15 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         return false;
+                    }
+                });
+
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                Uri.parse("http://maps.google.com/maps?daddr=" + marker.getPosition().latitude + "," + marker.getPosition().longitude));
+                        startActivity(intent);
                     }
                 });
 

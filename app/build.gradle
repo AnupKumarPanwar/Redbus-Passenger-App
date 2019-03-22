@@ -45,4 +45,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
+    implementation 'com.github.cooltechworks:ScratchView:v1.1'
 }

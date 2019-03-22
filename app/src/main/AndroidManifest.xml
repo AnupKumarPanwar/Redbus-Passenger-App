@@ -20,6 +20,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".WalletActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".LocateActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".TripsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

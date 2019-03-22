@@ -12,10 +12,14 @@
             android:id="@+id/trips"
             android:icon="@drawable/ic_directions_bus_black_24dp"
             android:title="Trips" />
+        <!--<item-->
+        <!--android:id="@+id/locate"-->
+        <!--android:icon="@drawable/ic_gps_fixed_black_24dp"-->
+        <!--android:title="Locate" />-->
         <item
-            android:id="@+id/locate"
-            android:icon="@drawable/ic_gps_fixed_black_24dp"
-            android:title="Locate" />
+            android:id="@+id/wallet"
+            android:icon="@drawable/ic_account_balance_wallet_black_24dp"
+            android:title="Wallet" />
         <item
             android:id="@+id/help"
             android:icon="@drawable/ic_help_black_24dp"
