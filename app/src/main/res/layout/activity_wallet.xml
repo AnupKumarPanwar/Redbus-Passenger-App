@@ -28,6 +28,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
@@ -36,10 +37,10 @@
                 android:src="@drawable/wallet_background" />
 
             <TextView
+                android:layout_above="@id/total_credits"
                 android:id="@+id/symbol"
                 android:layout_width="wrap_content"
                 android:layout_height="85dp"
-                android:layout_marginTop="45dp"
                 android:fontFamily="monospace"
                 android:gravity="center_vertical"
                 android:paddingLeft="20dp"
@@ -48,10 +49,10 @@
                 android:textSize="40sp" />
 
             <TextView
+                android:layout_alignTop="@id/symbol"
                 android:id="@+id/credits"
                 android:layout_width="match_parent"
                 android:layout_height="85dp"
-                android:layout_marginTop="45dp"
                 android:layout_toRightOf="@+id/symbol"
                 android:fontFamily="monospace"
                 android:gravity="center_vertical"
@@ -61,9 +62,11 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/total_credits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/credits"
+                android:layout_alignBottom="@id/imageView"
+                android:layout_marginBottom="20dp"
                 android:paddingLeft="20dp"
                 android:text="Total credits"
                 android:textColor="#000"

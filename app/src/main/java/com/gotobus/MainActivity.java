@@ -57,6 +57,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -572,6 +573,7 @@ public class MainActivity extends AppCompatActivity
                                 busPhone = route.get("phone").toString();
                                 busNumber = route.get("bus_number").toString();
                                 waypoints = route.get("waypoints").toString();
+//
                                 busSource = route.get("sourceLatLong").toString().split(",");
                                 busDestination = route.get("destinationLatLong").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busSource[0]), Double.parseDouble(busSource[1]));
@@ -589,6 +591,7 @@ public class MainActivity extends AppCompatActivity
 //                                    handler.postDelayed(getBusLocationRunnable, 12000);
 
                                     lineColor = "#0fa4e6";
+
                                     String url = getDirectionsUrl(origin, dest, waypoints);
                                     DownloadTask downloadTask = new DownloadTask(lineColor);
                                     downloadTask.execute(url);
@@ -991,7 +994,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
 
         mMap.setBuildingsEnabled(true);
 
@@ -1133,34 +1136,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private class DownloadTask extends AsyncTask<String, Void, String> {
-        String lineColor;
+    private String getDirectionsUrl(LatLng origin, LatLng dest, String waypoints) {
 
-        public DownloadTask(String lineColor) {
-            this.lineColor = lineColor;
-        }
+        Log.d("waypoints_url", "getDirectionsUrl: " + waypoints);
 
-        @Override
-        protected String doInBackground(String... url) {
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
 
-            String data = "";
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
 
-            try {
-                data = downloadUrl(url[0]);
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
-        }
+        // Sensor enabled
+        String sensor = "sensor=false";
+        String mode = "mode=driving";
 
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
+        String apiKey = "key=" + getResources().getString(R.string.google_maps_key);
+        String callback = "callback=initialize";
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + apiKey + "&" + callback;
 
-            ParserTask parserTask = new ParserTask(lineColor);
-            parserTask.execute(result);
+        Log.d("waypoints_url", "getDirectionsUrl: " + waypoints);
 
-        }
+        parameters += "&waypoints=" + waypoints;
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+        url = url.replaceAll(" ", "%20");
+
+        return url;
     }
 
 
@@ -1234,34 +1240,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest, String waypoints) {
-
-        // Origin of route
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-
-        // Destination of route
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-
-        // Sensor enabled
-        String sensor = "sensor=false";
-        String mode = "mode=driving";
-
-        String apiKey = "key=" + getResources().getString(R.string.google_maps_key);
-        String callback = "callback=initialize";
-        // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + apiKey + "&" + callback;
-
-        parameters += "&waypoints=" + waypoints;
-        // Output format
-        String output = "json";
-
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-
-        return url;
-    }
-
     /**
      * A method to download json data from url
      */
@@ -1292,12 +1270,43 @@ public class MainActivity extends AppCompatActivity
             br.close();
 
         } catch (Exception e) {
-            Log.d("Exception", e.toString());
+            Log.d("Download Exception", e.toString());
         } finally {
             iStream.close();
             urlConnection.disconnect();
         }
         return data;
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+        String lineColor;
+
+        public DownloadTask(String lineColor) {
+            this.lineColor = lineColor;
+        }
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            String data = "";
+
+            try {
+                Log.d("download_url", url[0]);
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask(lineColor);
+            parserTask.execute(result);
+
+        }
     }
 
     @Override
