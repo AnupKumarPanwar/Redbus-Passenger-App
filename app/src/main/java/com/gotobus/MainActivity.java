@@ -590,7 +590,8 @@ public class MainActivity extends AppCompatActivity
                                     mMap.addMarker(destinationMarkerOption);
 //                                    handler.postDelayed(getBusLocationRunnable, 12000);
 
-                                    lineColor = "#0fa4e6";
+//                                    lineColor = "#0fa4e6";
+                                    lineColor = "#000000";
 
                                     String url = getDirectionsUrl(origin, dest, waypoints);
                                     DownloadTask downloadTask = new DownloadTask(lineColor);
@@ -612,7 +613,8 @@ public class MainActivity extends AppCompatActivity
                                             .position(dest);
                                     mMap.addMarker(nearestSourceOption);
                                     waypoints = "";
-                                    lineColor = "#00FF00";
+//                                    lineColor = "#00FF00";
+                                    lineColor = "#007c0e";
                                     String url1 = getDirectionsUrl(origin, dest, waypoints);
                                     DownloadTask downloadTask1 = new DownloadTask(lineColor);
                                     downloadTask1.execute(url1);
@@ -633,7 +635,8 @@ public class MainActivity extends AppCompatActivity
                                             .position(origin);
                                     mMap.addMarker(nearestDestinationOption);
                                     waypoints = "";
-                                    lineColor = "#FF0000";
+//                                    lineColor = "#FF0000";
+                                    lineColor = "#ad0000";
                                     String url2 = getDirectionsUrl(origin, dest, waypoints);
                                     DownloadTask downloadTask2 = new DownloadTask(lineColor);
                                     downloadTask2.execute(url2);
