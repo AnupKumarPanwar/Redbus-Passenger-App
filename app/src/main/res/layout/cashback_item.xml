@@ -37,13 +37,11 @@
         </LinearLayout>
 
 
-        <!--<com.anupkumarpanwar.scratchview.ScratchView-->
-        <!--android:id="@+id/scratch_view"-->
-        <!--android:layout_width="180dp"-->
-        <!--android:layout_height="180dp"-->
-        <!--app:overlay_height="180dp"-->
-        <!--app:overlay_image="@drawable/cashback_cover"-->
-        <!--app:overlay_width="180dp" />-->
+        <ImageView
+            android:id="@+id/scratch_view"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:src="@drawable/cashback_cover" />
 
     </android.support.v7.widget.CardView>
 

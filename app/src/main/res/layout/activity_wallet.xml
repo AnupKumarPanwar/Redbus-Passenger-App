@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
@@ -55,7 +56,7 @@
                 android:layout_toRightOf="@+id/symbol"
                 android:fontFamily="monospace"
                 android:gravity="center_vertical"
-                android:text="200"
+                android:text="0"
                 android:textColor="#000"
                 android:textSize="60sp"
                 android:textStyle="bold" />
@@ -83,10 +84,10 @@
 
         <GridView
             android:id="@+id/grid_view"
-            android:horizontalSpacing="18dp"
-            android:nestedScrollingEnabled="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:horizontalSpacing="18dp"
+            android:nestedScrollingEnabled="true"
             android:numColumns="auto_fit"
             android:padding="15dp"
             android:verticalSpacing="18dp">
@@ -96,10 +97,105 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/expanded_image"
+    <RelativeLayout
+        android:id="@+id/large_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible" />
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/bg_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.95"
+            android:background="#000" />
+
+        <RelativeLayout
+            android:id="@+id/scratch_card_container"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:gravity="center"
+            android:nestedScrollingEnabled="true">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
+                        android:src="@drawable/trophy" />
+
+                    <TextView
+                        android:id="@+id/amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="You've won\n₹899"
+                        android:textSize="22sp" />
+
+                </LinearLayout>
+
+
+                <com.anupkumarpanwar.scratchview.ScratchView
+                    android:id="@+id/scratch_view"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    card_view:overlay_height="250dp"
+                    card_view:overlay_image="@drawable/cashback_cover"
+                    card_view:overlay_width="250dp" />
+
+            </android.support.v7.widget.CardView>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/surprise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/scratch_card_container"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:text="🎉 Surprise! 🎉 \n\n Earned for travelling with"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/surprise"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Pawan Travels"
+            android:textColor="#FFF"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/blue_round_button"
+            android:text="Tell your friends"
+            android:textAllCaps="false"
+            android:textColor="#fff" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

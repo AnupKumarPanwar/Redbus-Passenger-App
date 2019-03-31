@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,6 +39,11 @@ class CashbacksAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.cashback_item, parent, false);
         TextView amount;
+        ImageView overlay;
+        overlay = view.findViewById(R.id.scratch_view);
+        if (cashbacks.get(position).status.equals("SCRATCHED")) {
+            overlay.setVisibility(View.GONE);
+        }
         amount = view.findViewById(R.id.amount);
         amount.setText("You've won\n₹" + cashbacks.get(position).amount);
         return view;
