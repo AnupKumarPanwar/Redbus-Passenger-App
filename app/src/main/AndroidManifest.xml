@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.gotobus">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -18,31 +19,32 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon,android:roundIcon">
         <activity
-            android:name=".WalletActivity"
+            android:name=".screens.WalletActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
-            android:name=".LocateActivity"
+            android:name=".screens.LocateActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".TripsActivity"
+            android:name=".screens.TripsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".screens.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".MainActivity"
+            android:name=".screens.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".screens.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SignupActivity"
+            android:name=".screens.SignupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".OTPActivity"
+            android:name=".screens.OTPActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -57,10 +59,10 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".BookBusActivity"
+            android:name=".screens.BookBusActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".screens.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

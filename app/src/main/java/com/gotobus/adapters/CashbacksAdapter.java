@@ -1,4 +1,4 @@
-package com.gotobus;
+package com.gotobus.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,9 +8,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gotobus.classes.Cashback;
+import com.gotobus.R;
+
 import java.util.ArrayList;
 
-class CashbacksAdapter extends BaseAdapter {
+public class CashbacksAdapter extends BaseAdapter {
     Context context;
     ArrayList<Cashback> cashbacks;
 

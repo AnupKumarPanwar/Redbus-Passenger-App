@@ -1,10 +1,12 @@
-package com.gotobus;
+package com.gotobus.screens;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+
+import com.gotobus.R;
 
 public class LocateActivity extends AppCompatActivity {
 

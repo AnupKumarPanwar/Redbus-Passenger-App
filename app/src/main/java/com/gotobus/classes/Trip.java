@@ -1,7 +1,7 @@
-package com.gotobus;
+package com.gotobus.classes;
 
 public class Trip {
-    String date, bus, fare, type, status, source, destination;
+    public String date, bus, fare, type, status, source, destination;
 
     public Trip(String date, String bus, String fare, String type, String status, String source, String destination) {
         this.date = date;

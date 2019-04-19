@@ -1,7 +1,7 @@
-package com.gotobus;
+package com.gotobus.classes;
 
 public class Cashback {
-    String id, amount, status;
+    public String id, amount, status;
 
     public Cashback(String id, String amount, String status) {
         this.id = id;

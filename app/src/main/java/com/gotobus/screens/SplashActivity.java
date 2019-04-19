@@ -1,4 +1,4 @@
-package com.gotobus;
+package com.gotobus.screens;
 
 import android.content.Intent;
 import android.content.IntentSender;
@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.gotobus.R;
 
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult> {
     protected GoogleApiClient mGoogleApiClient;

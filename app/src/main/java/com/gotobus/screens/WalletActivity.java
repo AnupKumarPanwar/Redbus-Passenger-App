@@ -1,4 +1,4 @@
-package com.gotobus;
+package com.gotobus.screens;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -29,6 +29,10 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.anupkumarpanwar.scratchview.ScratchView;
+import com.gotobus.adapters.CashbacksAdapter;
+import com.gotobus.classes.Cashback;
+import com.gotobus.utility.NetworkCookies;
+import com.gotobus.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.gotobus;
+package com.gotobus.screens;
 
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -14,6 +14,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.gotobus.utility.NetworkCookies;
+import com.gotobus.R;
+import com.gotobus.classes.Trip;
+import com.gotobus.adapters.TripsAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

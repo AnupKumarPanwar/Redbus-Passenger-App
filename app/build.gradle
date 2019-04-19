@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "in.gotobus"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 6
         versionName "1.6b"
@@ -46,4 +46,5 @@ dependencies {
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     implementation 'com.github.AnupKumarPanwar:ScratchView:1.3'
     implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.github.GrenderG:Toasty:1.4.2'
 }

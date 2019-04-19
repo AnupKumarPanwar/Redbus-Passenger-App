@@ -1,4 +1,4 @@
-package com.gotobus;
+package com.gotobus.screens;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,18 +15,11 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.gotobus.utility.NetworkCookies;
+import com.gotobus.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 
 public class ProfileActivity extends AppCompatActivity {
 
