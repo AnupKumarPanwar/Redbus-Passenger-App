@@ -2,7 +2,8 @@ package com.gotobus.screens;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.GridView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.gotobus.R;
 import com.gotobus.adapters.SeatsAdapter;
@@ -11,7 +12,7 @@ import com.gotobus.classes.Seat;
 import java.util.ArrayList;
 
 public class SeatSelectionActivity extends AppCompatActivity {
-    GridView leftRow, rightRow;
+    RecyclerView leftRow, rightRow;
     SeatsAdapter leftSeatsAdapter, rightSeatsAdapter;
     ArrayList<Seat> seatsLeftRow;
     ArrayList<Seat> seatsRightRow;
@@ -25,6 +26,15 @@ public class SeatSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_seat_selection);
         leftRow = findViewById(R.id.left_row);
         rightRow = findViewById(R.id.right_row);
+
+//        leftRow.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
+//        rightRow.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
+
+        GridLayoutManager glm = new GridLayoutManager(this, 2);
+        leftRow.setLayoutManager(glm);
+
+        GridLayoutManager glm2 = new GridLayoutManager(this, 2);
+        rightRow.setLayoutManager(glm2);
 
         seatsLeftRow = new ArrayList<>();
         seatsRightRow = new ArrayList<>();
