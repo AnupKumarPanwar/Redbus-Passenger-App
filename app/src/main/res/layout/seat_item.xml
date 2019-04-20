@@ -17,6 +17,7 @@
             android:src="@drawable/ic_event_seat_black_24dp" />
 
         <TextView
+            android:id="@+id/seat_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"

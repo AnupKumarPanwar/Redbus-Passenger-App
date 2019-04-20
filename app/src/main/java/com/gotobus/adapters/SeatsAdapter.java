@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import com.gotobus.R;
 import com.gotobus.classes.Seat;
@@ -39,14 +40,9 @@ public class SeatsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.seat_item, parent, false);
-//        TextView amount;
-//        ImageView overlay;
-//        overlay = view.findViewById(R.id.scratch_view);
-//        if (seats.get(position).status.equals("SCRATCHED")) {
-//            overlay.setVisibility(View.GONE);
-//        }
-//        amount = view.findViewById(R.id.amount);
-//        amount.setText("You've won\n₹" + seats.get(position).amount);
+        TextView seatNumber;
+        seatNumber = view.findViewById(R.id.seat_number);
+        seatNumber.setText(seats.get(position).id);
         return view;
     }
 }
