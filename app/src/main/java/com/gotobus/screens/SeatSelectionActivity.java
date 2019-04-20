@@ -12,45 +12,36 @@ import com.gotobus.classes.Seat;
 import java.util.ArrayList;
 
 public class SeatSelectionActivity extends AppCompatActivity {
-    RecyclerView leftRow, rightRow;
+    RecyclerView seatsGrid;
     SeatsAdapter leftSeatsAdapter, rightSeatsAdapter;
     ArrayList<Seat> seatsLeftRow;
     ArrayList<Seat> seatsRightRow;
-    int counter = 1;
-    int[] volvoLeftSeats = {41, 42, 37, 38, 33, 34, 29, 30, 25, 26, 21, 22, 17, 18, 13, 14, 9, 10, 5, 6, 1, 2};
-    int[] volvoRightSeats = {43, 44, 39, 40, 35, 36, 31, 32, 27, 28, 23, 24, 19, 20, 15, 16, 11, 12, 7, 8, 3, 4};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seat_selection);
-        leftRow = findViewById(R.id.left_row);
-        rightRow = findViewById(R.id.right_row);
+        seatsGrid = findViewById(R.id.seats);
 
-//        leftRow.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
-//        rightRow.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
-
-        GridLayoutManager glm = new GridLayoutManager(this, 2);
-        leftRow.setLayoutManager(glm);
-
-        GridLayoutManager glm2 = new GridLayoutManager(this, 2);
-        rightRow.setLayoutManager(glm2);
+        seatsGrid.setLayoutManager(new GridLayoutManager(getApplicationContext(), 5));
 
         seatsLeftRow = new ArrayList<>();
         seatsRightRow = new ArrayList<>();
 
-
-        for (int seatNumber : volvoLeftSeats) {
-            seatsLeftRow.add(new Seat(String.valueOf(seatNumber), "Available"));
+        int seatNumber = 41;
+        while (seatNumber>0) {
+            for (int i=0; i<4; i++) {
+                if (i==2) {
+                    seatsLeftRow.add(new Seat(null, "Blank"));
+                }
+                seatsLeftRow.add(new Seat(String.valueOf(seatNumber+i), "Available"));
+            }
+            seatNumber-=4;
         }
 
-        for (int seatNumber : volvoRightSeats) {
-            seatsRightRow.add(new Seat(String.valueOf(seatNumber), "Available"));
-        }
 
         leftSeatsAdapter = new SeatsAdapter(getApplicationContext(), seatsLeftRow);
         rightSeatsAdapter = new SeatsAdapter(getApplicationContext(), seatsRightRow);
-        leftRow.setAdapter(leftSeatsAdapter);
-        rightRow.setAdapter(rightSeatsAdapter);
+        seatsGrid.setAdapter(leftSeatsAdapter);
     }
 }

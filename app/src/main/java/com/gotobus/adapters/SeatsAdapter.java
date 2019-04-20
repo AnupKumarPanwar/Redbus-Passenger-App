@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gotobus.R;
@@ -29,8 +30,16 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         holder.seatNumber.setText(seats.get(position).id);
+        if (seats.get(position).status.equals("Blank")){
+            holder.container.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -45,10 +54,12 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView seatNumber;
+        LinearLayout container;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             seatNumber = itemView.findViewById(R.id.seat_number);
+            container = itemView.findViewById(R.id.container);
         }
     }
 }
