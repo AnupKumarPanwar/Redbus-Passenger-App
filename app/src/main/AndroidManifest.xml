@@ -22,8 +22,14 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:roundIcon">
         <activity
-            android:name=".screens.WalletActivity"
+            android:name=".screens.SeatSelectionActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".screens.ViewMoreActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".screens.WalletActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".screens.LocateActivity"
             android:theme="@style/AppTheme.NoActionBar" />

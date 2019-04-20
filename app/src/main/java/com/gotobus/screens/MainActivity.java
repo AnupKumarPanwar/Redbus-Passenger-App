@@ -63,9 +63,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.gotobus.R;
 import com.gotobus.utility.DirectionsJSONParser;
 import com.gotobus.utility.NetworkCookies;
-import com.gotobus.R;
 import com.gotobus.utility.ResponseValidator;
 
 import org.json.JSONArray;
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
 
     String lineColor = "#0fa4e6";
 
-    Button bookNow;
+    Button bookNow, viewMore;
 
     String busName = "", busNumber = "", busPhone = "", busId = "", routeId = "", busType = "", bookedBusType = "", otp = "", fare = "";
 
@@ -156,10 +156,10 @@ public class MainActivity extends AppCompatActivity
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        //toolbar.setNavigationIcon(R.drawable.ic_toolbar);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
+//        getSupportActionBar().setDisplayShowTitleEnabled(true);
+//        //toolbar.setNavigationIcon(R.drawable.ic_toolbar);
+//        toolbar.setTitle("");
+//        toolbar.setSubtitle("");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
         bookNow = findViewById(R.id.book_now);
+        viewMore = findViewById(R.id.view_more);
         busNameView = findViewById(R.id.bus_name);
         busNumberView = findViewById(R.id.bus_number);
         fareView = findViewById(R.id.fare);
@@ -223,6 +224,14 @@ public class MainActivity extends AppCompatActivity
                         .setNegativeButton(android.R.string.no, null)
                         .show();
 
+            }
+        });
+
+        viewMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ViewMoreActivity.class);
+                startActivity(intent);
             }
         });
 
