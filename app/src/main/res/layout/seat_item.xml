@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="70dp"
-    android:layout_height="90dp"
+    android:layout_width="50dp"
+    android:layout_height="55dp"
     android:gravity="center">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
+            android:layout_centerInParent="true"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_event_seat_black_24dp" />
 
         <TextView
+            android:layout_height="match_parent"
             android:id="@+id/seat_number"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="0dp"
             android:gravity="center"
-            android:text="21" />
+            android:paddingBottom="13dp"
+            android:text="21"
+            android:textColor="#fff"
+            android:textSize="10sp" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

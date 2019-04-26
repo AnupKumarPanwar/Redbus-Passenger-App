@@ -3,82 +3,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+
+    <TextView
+        android:id="@+id/trip_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
+        android:padding="15dp"
+        android:text="24/04/2019 🔻"
+        android:textSize="25sp"
+        android:textStyle="bold" />
 
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/source"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="#FFF"
-                android:focusedByDefault="false"
-                android:gravity="center_vertical"
-                android:hint="Source"
-                android:paddingLeft="40dp"
-                android:paddingTop="5dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="5dp"
-                android:textSize="15sp" />
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:background="#00FF00" />
-
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/destination"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="#FFF"
-                android:gravity="center_vertical"
-                android:hint="Destination"
-                android:paddingLeft="40dp"
-                android:paddingTop="5dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="5dp"
-                android:textSize="15sp" />
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:background="#FF0000" />
-        </RelativeLayout>
-
-        <DatePicker
-            android:id="@+id/date_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"></DatePicker>
-
-    </LinearLayout>
-
-
-    <Button
-        android:id="@+id/search_button"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/orange_rect_button"
-        android:text="Search"
-        android:textColor="#FFF" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trip_date">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/recycler_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+
 
 </RelativeLayout>

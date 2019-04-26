@@ -1,11 +1,12 @@
 package com.gotobus.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.gotobus.R;
@@ -35,11 +36,24 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         holder.seatNumber.setText(seats.get(position).id);
         if (seats.get(position).status.equals("Blank")){
             holder.container.setVisibility(View.GONE);
         }
+        holder.container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (seats.get(position).status.equals("Selected")) {
+                    holder.container.setBackgroundColor(Color.TRANSPARENT);
+                    seats.get(position).setStatus("Blank");
+
+                } else {
+                    holder.container.setBackgroundColor(Color.parseColor("#22ee33"));
+                    seats.get(position).setStatus("Selected");
+                }
+            }
+        });
     }
 
     @Override
@@ -54,7 +68,7 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView seatNumber;
-        LinearLayout container;
+        RelativeLayout container;
 
         public MyViewHolder(View itemView) {
             super(itemView);
