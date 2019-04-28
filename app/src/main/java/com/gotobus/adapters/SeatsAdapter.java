@@ -38,17 +38,21 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         holder.seatNumber.setText(seats.get(position).id);
+        if (seats.get(position).status.equals("Booked")) {
+            holder.container.setBackgroundColor(Color.GRAY);
+        }
         if (seats.get(position).status.equals("Blank")){
             holder.container.setVisibility(View.GONE);
         }
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (seats.get(position).status.equals("Selected")) {
                     holder.container.setBackgroundColor(Color.TRANSPARENT);
-                    seats.get(position).setStatus("Blank");
+                    seats.get(position).setStatus("Available");
 
-                } else {
+                } else if (seats.get(position).status.equals("Available")) {
                     holder.container.setBackgroundColor(Color.parseColor("#22ee33"));
                     seats.get(position).setStatus("Selected");
                 }

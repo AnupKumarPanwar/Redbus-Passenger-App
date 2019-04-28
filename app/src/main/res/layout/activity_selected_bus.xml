@@ -1,131 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.gotobus.screens.SelectedBusActivity">
 
-    <TextView
-        android:id="@+id/title"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="15dp"
-        android:text="INDO CANDIAN TRANSPORT CO."
-        android:textColor="#000"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="15dp">
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="INDO CANDIAN TRANSPORT CO."
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="5">
+                android:orientation="vertical"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp">
 
-                <TextView
-                    android:id="@+id/type"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:gravity="start"
-                    android:text="Semi Sleeper" />
+                    android:orientation="horizontal"
+                    android:weightSum="5">
 
-                <TextView
-                    android:id="@+id/fare"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="end"
-                    android:text="Rs. 500"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/type"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:gravity="start"
+                        android:text="Semi Sleeper" />
 
-                <!--<TextView-->
-                <!--android:id="@+id/status"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="end"-->
-                <!--android:text="status" />-->
+                    <TextView
+                        android:id="@+id/fare"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:gravity="end"
+                        android:text="Rs. 500"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
+                    <!--<TextView-->
+                    <!--android:id="@+id/status"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:gravity="end"-->
+                    <!--android:text="status" />-->
+
+                </LinearLayout>
             </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:background="#FFF"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="7">
+
+                    <TextView
+                        android:id="@+id/departure_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="#FFF"
+                        android:focusedByDefault="false"
+                        android:gravity="center_vertical"
+                        android:hint="05:00 AM"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/source"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:background="#FFF"
+                        android:focusedByDefault="false"
+                        android:gravity="center_vertical"
+                        android:hint="Tribune Society Complex, Raipur Khurd, Chandigarh 160003"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:background="#00FF00" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFF"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="7">
+
+                    <TextView
+                        android:id="@+id/arrival_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="#FFF"
+                        android:focusedByDefault="false"
+                        android:gravity="center_vertical"
+                        android:hint="05:00 AM"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/destination"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:background="#FFF"
+                        android:gravity="center_vertical"
+                        android:hint="Near, Lothian Rd, Inter State Bus Terminal, Mori Gate, New Delhi, Delhi 110006"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:background="#FF0000" />
+            </RelativeLayout>
+
         </LinearLayout>
 
-        <RelativeLayout
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/source"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="#FFF"
-                android:focusedByDefault="false"
-                android:gravity="center_vertical"
-                android:hint="Source"
-                android:paddingLeft="40dp"
-                android:paddingTop="5dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="5dp"
-                android:textSize="15sp" />
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:background="#00FF00" />
-
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/destination"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="#FFF"
-                android:gravity="center_vertical"
-                android:hint="Destination"
-                android:paddingLeft="40dp"
-                android:paddingTop="5dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="5dp"
-                android:textSize="15sp" />
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:background="#FF0000" />
-        </RelativeLayout>
+            android:layout_height="match_parent"
+            tools:context=".screens.MainActivity" />
 
     </LinearLayout>
 
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <Button
+        android:id="@+id/continue_to_seat_selection"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".screens.MainActivity" />
-
-</LinearLayout>
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/orange_rect_button"
+        android:text="Continue"
+        android:textColor="#FFF" />
+</RelativeLayout>

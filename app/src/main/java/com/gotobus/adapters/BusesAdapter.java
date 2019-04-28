@@ -32,7 +32,7 @@ public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder myViewHolder, int i) {
+    public void onBindViewHolder(MyViewHolder myViewHolder, final int i) {
         myViewHolder.fare.setText("₹" + buses.get(i).fare);
         myViewHolder.type.setText(buses.get(i).type);
         myViewHolder.name.setText(buses.get(i).name);
@@ -43,6 +43,7 @@ public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(context, SelectedBusActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("bus_name", buses.get(i).name);
                 context.startActivity(intent);
             }
         });

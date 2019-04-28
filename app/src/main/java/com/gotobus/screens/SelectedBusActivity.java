@@ -12,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -38,6 +40,8 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private CameraPosition mCameraPosition;
 
+    Button contibueToSeatSelection;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,17 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        contibueToSeatSelection = findViewById(R.id.continue_to_seat_selection);
+        contibueToSeatSelection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SeatSelectionActivity.class);
+                String busName = getIntent().getExtras().get("bus_name").toString();
+                intent.putExtra("bus_name", busName);
+                startActivity(intent);
+            }
+        });
     }
 
 

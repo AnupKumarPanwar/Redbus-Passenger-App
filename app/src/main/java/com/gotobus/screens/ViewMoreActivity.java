@@ -56,8 +56,8 @@ public class ViewMoreActivity extends AppCompatActivity {
         buses = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
-        buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
+        buses.add(new Bus("Dhall Tours and Travels ", "450", "AC", "Now", "Tomorrow 5:40"));
+        buses.add(new Bus("Vishnu Buses", "450", "AC", "Now", "Tomorrow 5:40"));
         buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
         buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
         busesAdapter = new BusesAdapter(getApplicationContext(), buses);

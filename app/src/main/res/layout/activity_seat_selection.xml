@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:paddingBottom="50dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="75dp">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/seats"
-                android:padding="25dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="25dp">
 
             </android.support.v7.widget.RecyclerView>
 
@@ -30,4 +29,34 @@
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="2"
+            android:background="#fff"
+            android:gravity="center"
+            android:text="Rs. 1024"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/continue_to_seat_selection"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_weight="3"
+            android:background="@drawable/orange_rect_button"
+            android:gravity="center"
+            android:text="Confirm Booking"
+            android:textColor="#FFF" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>
