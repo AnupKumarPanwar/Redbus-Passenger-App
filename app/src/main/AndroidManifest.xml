@@ -21,7 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:roundIcon">
-        <activity android:name=".screens.SelectedBusActivity"></activity>
+        <activity
+            android:name=".screens.SelectedBusActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".screens.SeatSelectionActivity"
             android:theme="@style/AppTheme.NoActionBar" />
