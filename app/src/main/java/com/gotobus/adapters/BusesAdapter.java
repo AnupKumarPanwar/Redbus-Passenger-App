@@ -44,6 +44,10 @@ public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder
                 Intent intent = new Intent(context, SelectedBusActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("bus_name", buses.get(i).name);
+                intent.putExtra("bus_type", buses.get(i).type);
+                intent.putExtra("fare", buses.get(i).fare);
+                intent.putExtra("arrival_time", buses.get(i).arrivalTime);
+                intent.putExtra("departure_time", buses.get(i).departureTime);
                 context.startActivity(intent);
             }
         });

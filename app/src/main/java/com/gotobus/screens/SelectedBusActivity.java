@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,6 +42,7 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
     private CameraPosition mCameraPosition;
 
     Button contibueToSeatSelection;
+    TextView title, type, fare,
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -51,6 +53,10 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        title = findViewById(R.id.title);
+        String busName = getIntent().getExtras().get("bus_name").toString();
+        title.setText(busName);
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);

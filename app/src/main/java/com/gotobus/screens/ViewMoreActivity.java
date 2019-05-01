@@ -1,6 +1,7 @@
 package com.gotobus.screens;
 
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,10 +9,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.gotobus.R;
 import com.gotobus.adapters.BusesAdapter;
 import com.gotobus.classes.Bus;
+import com.gotobus.utility.NetworkCookies;
+import com.gotobus.utility.ResponseValidator;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,12 +35,23 @@ public class ViewMoreActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     BusesAdapter busesAdapter;
     ArrayList<Bus> buses;
+    String accessToken;
+    SharedPreferences sharedPreferences;
+    String PREFS_NAME = "MyApp_Settings";
+    String baseUrl;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_more);
+
+        baseUrl = getResources().getString(R.string.base_url);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        accessToken = sharedPreferences.getString("access_token", null);
+
+        searchBuses();
+
         tripDate = findViewById(R.id.trip_date);
         tripDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,11 +78,47 @@ public class ViewMoreActivity extends AppCompatActivity {
         buses = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        buses.add(new Bus("Dhall Tours and Travels ", "450", "AC", "Now", "Tomorrow 5:40"));
-        buses.add(new Bus("Vishnu Buses", "450", "AC", "Now", "Tomorrow 5:40"));
-        buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
-        buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
+//        buses.add(new Bus("Dhall Tours and Travels ", "450", "AC", "Now", "Tomorrow 5:40"));
+//        buses.add(new Bus("Vishnu Buses", "450", "AC", "Now", "Tomorrow 5:40"));
+//        buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
+//        buses.add(new Bus("Dhall Travels", "450", "AC", "Now", "Tomorrow 5:40"));
         busesAdapter = new BusesAdapter(getApplicationContext(), buses);
         recyclerView.setAdapter(busesAdapter);
+    }
+
+    private void searchBuses() {
+        AndroidNetworking.post(baseUrl + "/searchLater.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("source", "chandigarh")
+                .addBodyParameter("destination", "delhi")
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (ResponseValidator.validate(ViewMoreActivity.this, response)) {
+                                JSONObject result = response.getJSONObject("result");
+                                boolean success = Boolean.parseBoolean(result.get("success").toString());
+                                if (success) {
+                                    JSONArray data = result.getJSONArray("data");
+                                    for (int i = 0; i < data.length(); i++) {
+                                        JSONObject bus = data.getJSONObject(i);
+                                        buses.add(new Bus(bus.get("name").toString(), "500", bus.get("bus_type").toString(), "Now", "Tomorrow 5:40"));
+                                    }
+                                    busesAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError error) {
+                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
