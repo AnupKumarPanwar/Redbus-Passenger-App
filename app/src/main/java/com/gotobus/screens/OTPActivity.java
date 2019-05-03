@@ -2,8 +2,8 @@ package com.gotobus.screens;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,9 +14,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.gotobus.utility.NetworkCookies;
 import com.gotobus.R;
+import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
+import com.gotobus.utility.UserVariables;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +75,7 @@ public class OTPActivity extends AppCompatActivity {
                                         String access_token = data.get("access_token").toString();
                                         editor.putString("access_token", access_token);
                                         editor.commit();
+                                        UserVariables.accessToken = access_token;
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);

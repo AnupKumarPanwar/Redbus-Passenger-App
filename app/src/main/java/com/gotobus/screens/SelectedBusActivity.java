@@ -15,7 +15,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +34,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.gotobus.R;
+import com.gotobus.utility.CustomMapUtils;
+import com.gotobus.utility.NetworkCookies;
+import com.gotobus.utility.ResponseValidator;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import static com.gotobus.utility.Journey.destinationLat;
+import static com.gotobus.utility.Journey.destinationLng;
+import static com.gotobus.utility.Journey.sourceLat;
+import static com.gotobus.utility.Journey.sourceLng;
+import static com.gotobus.utility.UserVariables.accessToken;
 
 public class SelectedBusActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -41,8 +58,11 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private CameraPosition mCameraPosition;
 
-    Button contibueToSeatSelection;
-    TextView title, type, fare,
+    Button continueToSeatSelection;
+    TextView title, type, fare, arrivalTime, departureTime, pickupPoint, dropoffPoint;
+    String busName, busType, busFare, busArrivalTime, busDepartureTime, source, destination;
+    CustomMapUtils customMapUtils;
+    String baseUrl;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -54,15 +74,40 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        baseUrl = getResources().getString(R.string.base_url);
+
+        customMapUtils = new CustomMapUtils(getApplicationContext());
+
         title = findViewById(R.id.title);
-        String busName = getIntent().getExtras().get("bus_name").toString();
+        type = findViewById(R.id.type);
+        fare = findViewById(R.id.fare);
+        arrivalTime = findViewById(R.id.arrival_time);
+        departureTime = findViewById(R.id.departure_time);
+        pickupPoint = findViewById(R.id.pickup_point);
+        dropoffPoint = findViewById(R.id.dropoff_point);
+
+
+        busName = getIntent().getExtras().get("bus_name").toString();
         title.setText(busName);
+
+        busType = getIntent().getExtras().get("bus_type").toString();
+        type.setText(busType);
+
+        busFare = getIntent().getExtras().get("fare").toString();
+        fare.setText("₹ " + busFare);
+
+        busArrivalTime = getIntent().getExtras().get("arrival_time").toString();
+        arrivalTime.setText(busArrivalTime);
+
+        busDepartureTime = getIntent().getExtras().get("departure_time").toString();
+        arrivalTime.setText(busArrivalTime);
+
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        contibueToSeatSelection = findViewById(R.id.continue_to_seat_selection);
-        contibueToSeatSelection.setOnClickListener(new View.OnClickListener() {
+        continueToSeatSelection = findViewById(R.id.continue_to_seat_selection);
+        continueToSeatSelection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SeatSelectionActivity.class);
@@ -71,6 +116,42 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                 startActivity(intent);
             }
         });
+
+        searchBus();
+    }
+
+    private void searchBus() {
+        AndroidNetworking.post(baseUrl + "/getNearestWaypoints.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("sourceLat", sourceLat)
+                .addBodyParameter("sourceLng", sourceLng)
+                .addBodyParameter("destinationLat", destinationLat)
+                .addBodyParameter("destinationLng", destinationLng)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (ResponseValidator.validate(SelectedBusActivity.this, response)) {
+                                JSONObject result = response.getJSONObject("result");
+                                boolean success = Boolean.parseBoolean(result.get("success").toString());
+                                if (success) {
+                                    JSONArray data = result.getJSONArray("data");
+//
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError error) {
+                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
 

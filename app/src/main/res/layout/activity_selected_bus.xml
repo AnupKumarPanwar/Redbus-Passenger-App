@@ -98,7 +98,7 @@
                         android:textSize="13sp" />
 
                     <TextView
-                        android:id="@+id/source"
+                        android:id="@+id/pickup_point"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5"
@@ -152,7 +152,7 @@
                         android:textSize="13sp" />
 
                     <TextView
-                        android:id="@+id/destination"
+                        android:id="@+id/dropoff_point"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5"

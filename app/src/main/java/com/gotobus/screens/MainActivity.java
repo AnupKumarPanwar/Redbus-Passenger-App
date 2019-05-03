@@ -65,6 +65,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.gotobus.R;
 import com.gotobus.utility.DirectionsJSONParser;
+import com.gotobus.utility.Journey;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
 
@@ -231,6 +232,16 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ViewMoreActivity.class);
+//                intent.putExtra("sourceLat", String.valueOf(sourceMarkerOption.getPosition().latitude));
+//                intent.putExtra("sourceLng", String.valueOf(sourceMarkerOption.getPosition().longitude));
+//                intent.putExtra("destinationLat", String.valueOf(destinationMarkerOption.getPosition().latitude));
+//                intent.putExtra("destinationLng", String.valueOf(destinationMarkerOption.getPosition().longitude));
+
+                Journey.sourceLat = String.valueOf(sourceMarkerOption.getPosition().latitude);
+                Journey.sourceLng = String.valueOf(sourceMarkerOption.getPosition().longitude);
+                Journey.destinationLat = String.valueOf(destinationMarkerOption.getPosition().latitude);
+                Journey.destinationLng = String.valueOf(destinationMarkerOption.getPosition().longitude);
+//
                 startActivity(intent);
             }
         });

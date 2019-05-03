@@ -18,14 +18,17 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.gotobus.R;
 import com.gotobus.adapters.BusesAdapter;
 import com.gotobus.classes.Bus;
+import com.gotobus.utility.Journey;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class ViewMoreActivity extends AppCompatActivity {
 
@@ -40,6 +43,8 @@ public class ViewMoreActivity extends AppCompatActivity {
     String PREFS_NAME = "MyApp_Settings";
     String baseUrl;
 
+    String sourceLat, sourceLng, destinationLat, destinationLng;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,12 @@ public class ViewMoreActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         accessToken = sharedPreferences.getString("access_token", null);
 
+        sourceLat = Journey.sourceLat;
+        sourceLng = Journey.sourceLng;
+        destinationLat = Journey.destinationLat;
+        destinationLng = Journey.destinationLng;
+
+//        Toast.makeText(getApplicationContext(), destinationLng.toString(), Toast.LENGTH_LONG).show();
         searchBuses();
 
         tripDate = findViewById(R.id.trip_date);
@@ -90,8 +101,10 @@ public class ViewMoreActivity extends AppCompatActivity {
         AndroidNetworking.post(baseUrl + "/searchLater.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
-                .addBodyParameter("source", "chandigarh")
-                .addBodyParameter("destination", "delhi")
+                .addBodyParameter("sourceLat", sourceLat)
+                .addBodyParameter("sourceLng", sourceLng)
+                .addBodyParameter("destinationLat", destinationLat)
+                .addBodyParameter("destinationLng", destinationLng)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
@@ -105,7 +118,11 @@ public class ViewMoreActivity extends AppCompatActivity {
                                     JSONArray data = result.getJSONArray("data");
                                     for (int i = 0; i < data.length(); i++) {
                                         JSONObject bus = data.getJSONObject(i);
-                                        buses.add(new Bus(bus.get("name").toString(), "500", bus.get("bus_type").toString(), "Now", "Tomorrow 5:40"));
+                                        final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                        final Date dateObj = sdf.parse(bus.get("departure_time").toString());
+                                        String sdf2 = new SimpleDateFormat("hh:mm a").format(dateObj);
+
+                                        buses.add(new Bus(bus.get("name").toString(), "500", bus.get("bus_type").toString(), sdf2, "09:00PM"));
                                     }
                                     busesAdapter.notifyDataSetChanged();
                                 }
