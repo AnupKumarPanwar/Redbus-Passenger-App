@@ -122,7 +122,7 @@ public class ViewMoreActivity extends AppCompatActivity {
                                         final Date dateObj = sdf.parse(bus.get("departure_time").toString());
                                         String sdf2 = new SimpleDateFormat("hh:mm a").format(dateObj);
 
-                                        buses.add(new Bus(bus.get("name").toString(), "500", bus.get("bus_type").toString(), sdf2, "09:00PM"));
+                                        buses.add(new Bus(bus.get("route_id").toString(), bus.get("name").toString(), "500", bus.get("bus_type").toString(), sdf2, "09:00PM"));
                                     }
                                     busesAdapter.notifyDataSetChanged();
                                 }

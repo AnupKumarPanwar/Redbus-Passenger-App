@@ -43,6 +43,7 @@ public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(context, SelectedBusActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("route_id", buses.get(i).routeId);
                 intent.putExtra("bus_name", buses.get(i).name);
                 intent.putExtra("bus_type", buses.get(i).type);
                 intent.putExtra("fare", buses.get(i).fare);

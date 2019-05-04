@@ -1,7 +1,10 @@
 package com.gotobus.screens;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -23,14 +26,18 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.gotobus.R;
@@ -38,14 +45,15 @@ import com.gotobus.utility.CustomMapUtils;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Locale;
 
 import static com.gotobus.utility.Journey.destinationLat;
 import static com.gotobus.utility.Journey.destinationLng;
 import static com.gotobus.utility.Journey.sourceLat;
 import static com.gotobus.utility.Journey.sourceLng;
-import static com.gotobus.utility.UserVariables.accessToken;
 
 public class SelectedBusActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -60,9 +68,17 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
 
     Button continueToSeatSelection;
     TextView title, type, fare, arrivalTime, departureTime, pickupPoint, dropoffPoint;
-    String busName, busType, busFare, busArrivalTime, busDepartureTime, source, destination;
+    String routeId, busName, busType, busFare, busArrivalTime, busDepartureTime, source, destination;
     CustomMapUtils customMapUtils;
     String baseUrl;
+    MarkerOptions pickupMarkerOptions, dropoffMarkerOptions;
+    Double pickupLat, pickupLng, dropoffLat, dropoffLng;
+    LatLng pickupLatLng, dropoffLatLng;
+    String pickupAddress, dropoffAddress;
+
+    SharedPreferences sharedPreferences;
+    String PREFS_NAME = "MyApp_Settings";
+    String accessToken;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -75,6 +91,9 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
         mapFragment.getMapAsync(this);
 
         baseUrl = getResources().getString(R.string.base_url);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        accessToken = sharedPreferences.getString("access_token", null);
+
 
         customMapUtils = new CustomMapUtils(getApplicationContext());
 
@@ -86,6 +105,8 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
         pickupPoint = findViewById(R.id.pickup_point);
         dropoffPoint = findViewById(R.id.dropoff_point);
 
+
+        routeId = getIntent().getExtras().get("route_id").toString();
 
         busName = getIntent().getExtras().get("bus_name").toString();
         title.setText(busName);
@@ -128,6 +149,7 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                 .addBodyParameter("sourceLng", sourceLng)
                 .addBodyParameter("destinationLat", destinationLat)
                 .addBodyParameter("destinationLng", destinationLng)
+                .addBodyParameter("routeId", routeId)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
@@ -138,8 +160,59 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                                 JSONObject result = response.getJSONObject("result");
                                 boolean success = Boolean.parseBoolean(result.get("success").toString());
                                 if (success) {
-                                    JSONArray data = result.getJSONArray("data");
-//
+                                    JSONObject data = result.getJSONObject("data");
+                                    pickupLat = Double.parseDouble(data.getJSONArray("neareatSource").get(0).toString());
+                                    pickupLng = Double.parseDouble(data.getJSONArray("neareatSource").get(1).toString());
+                                    pickupLatLng = new LatLng(pickupLat, pickupLng);
+
+                                    dropoffLat = Double.parseDouble(data.getJSONArray("nearestDestination").get(0).toString());
+                                    dropoffLng = Double.parseDouble(data.getJSONArray("nearestDestination").get(1).toString());
+                                    dropoffLatLng = new LatLng(dropoffLat, dropoffLng);
+
+                                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                    try {
+                                        List<Address> addresses = geocoder.getFromLocation(pickupLatLng.latitude, pickupLatLng.longitude, 1);
+                                        Address address = addresses.get(0);
+                                        pickupAddress = address.getAddressLine(0);
+                                        pickupPoint.setText(pickupAddress);
+
+                                    } catch (Exception e) {
+                                        Log.e("Exception", e.getMessage());
+                                    }
+
+                                    try {
+                                        List<Address> addresses = geocoder.getFromLocation(dropoffLatLng.latitude, dropoffLatLng.longitude, 1);
+                                        Address address = addresses.get(0);
+                                        dropoffAddress = address.getAddressLine(0);
+                                        dropoffPoint.setText(dropoffAddress);
+
+                                    } catch (Exception e) {
+                                        Log.e("Exception", e.getMessage());
+                                    }
+
+                                    pickupMarkerOptions = new MarkerOptions()
+                                            .title("Pickup Location")
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pickup_marker))
+                                            .position(pickupLatLng);
+                                    mMap.addMarker(pickupMarkerOptions);
+
+                                    dropoffMarkerOptions = new MarkerOptions()
+                                            .title("Pickup Location")
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.dropoff_marker))
+                                            .position(dropoffLatLng);
+                                    mMap.addMarker(dropoffMarkerOptions);
+
+                                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                                    builder.include(pickupMarkerOptions.getPosition());
+                                    builder.include(dropoffMarkerOptions.getPosition());
+
+
+                                    LatLngBounds bounds = builder.build();
+                                    int padding = 300; // offset from edges of the map in pixels
+                                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                                    mMap.animateCamera(cu);
+
                                 }
                             }
                         } catch (Exception e) {

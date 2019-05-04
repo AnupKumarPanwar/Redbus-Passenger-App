@@ -68,6 +68,7 @@ import com.gotobus.utility.DirectionsJSONParser;
 import com.gotobus.utility.Journey;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
+import com.gotobus.utility.UserVariables;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,6 +84,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -144,6 +147,8 @@ public class MainActivity extends AppCompatActivity
     ImageView callBus;
     Runnable adjustZoomLevel;
 
+    UserVariables userVariables;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,6 +178,8 @@ public class MainActivity extends AppCompatActivity
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         editor = sharedPreferences.edit();
         accessToken = sharedPreferences.getString("access_token", null);
+
+        userVariables = new UserVariables(getApplicationContext());
 
         AndroidNetworking.initialize(getApplicationContext());
 
@@ -232,17 +239,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ViewMoreActivity.class);
-//                intent.putExtra("sourceLat", String.valueOf(sourceMarkerOption.getPosition().latitude));
-//                intent.putExtra("sourceLng", String.valueOf(sourceMarkerOption.getPosition().longitude));
-//                intent.putExtra("destinationLat", String.valueOf(destinationMarkerOption.getPosition().latitude));
-//                intent.putExtra("destinationLng", String.valueOf(destinationMarkerOption.getPosition().longitude));
+                if (destinationMarkerOption != null && sourceMarkerOption != null) {
 
-                Journey.sourceLat = String.valueOf(sourceMarkerOption.getPosition().latitude);
-                Journey.sourceLng = String.valueOf(sourceMarkerOption.getPosition().longitude);
-                Journey.destinationLat = String.valueOf(destinationMarkerOption.getPosition().latitude);
-                Journey.destinationLng = String.valueOf(destinationMarkerOption.getPosition().longitude);
+                    Journey.sourceLat = String.valueOf(sourceMarkerOption.getPosition().latitude);
+                    Journey.sourceLng = String.valueOf(sourceMarkerOption.getPosition().longitude);
+                    Journey.destinationLat = String.valueOf(destinationMarkerOption.getPosition().latitude);
+                    Journey.destinationLng = String.valueOf(destinationMarkerOption.getPosition().longitude);
 //
-                startActivity(intent);
+                    startActivity(intent);
+                } else {
+                    Toasty.error(getApplicationContext(), "Please select source and destination", Toasty.LENGTH_LONG).show();
+                }
+
             }
         });
 

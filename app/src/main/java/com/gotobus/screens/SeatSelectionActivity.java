@@ -1,29 +1,55 @@
 package com.gotobus.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.gotobus.R;
 import com.gotobus.adapters.SeatsAdapter;
 import com.gotobus.classes.Seat;
+import com.gotobus.interfaces.SeatSelectListener;
+import com.razorpay.Checkout;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
+
 public class SeatSelectionActivity extends AppCompatActivity {
     RecyclerView seatsGrid;
-    SeatsAdapter leftSeatsAdapter, rightSeatsAdapter;
-    ArrayList<Seat> seatsLeftRow;
-    ArrayList<Seat> seatsRightRow;
+    SeatsAdapter seatsAdapter;
+    ArrayList<Seat> seatsRow;
     String busName;
+    int numSeatsSelected = 0;
+    TextView fareTextView;
+    Button confirmBookingBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seat_selection);
         seatsGrid = findViewById(R.id.seats);
+
+        fareTextView = findViewById(R.id.fare);
+        confirmBookingBtn = findViewById(R.id.book_confirm);
+        confirmBookingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (numSeatsSelected <= 0) {
+                    Toasty.error(getApplicationContext(), "Please select atleast 1 seat", Toasty.LENGTH_LONG).show();
+                } else {
+                    int fare = numSeatsSelected * 500;
+                    Intent intent = new Intent(getApplicationContext(), PaymentActivity.class);
+                    intent.putExtra("fare", fare);
+                    startActivity(intent);
+                }
+            }
+        });
 
         seatsGrid.setLayoutManager(new GridLayoutManager(getApplicationContext(), 5));
 
@@ -64,28 +90,37 @@ public class SeatSelectionActivity extends AppCompatActivity {
             occupied2 = occupied;
         }
 
-        seatsLeftRow = new ArrayList<>();
-        seatsRightRow = new ArrayList<>();
-        leftSeatsAdapter = new SeatsAdapter(getApplicationContext(), seatsLeftRow);
-        seatsGrid.setAdapter(leftSeatsAdapter);
+        seatsRow = new ArrayList<>();
+        seatsAdapter = new SeatsAdapter(getApplicationContext(), seatsRow);
+        seatsGrid.setAdapter(seatsAdapter);
 
 
         int seatNumber = 41;
         while (seatNumber > 0) {
             for (int i = 0; i < 4; i++) {
                 if (i == 2) {
-                    seatsLeftRow.add(new Seat(null, "Blank"));
+                    seatsRow.add(new Seat(null, "Blank"));
                 }
                 if (occupied2.indexOf(seatNumber + i) != -1) {
-                    seatsLeftRow.add(new Seat(String.valueOf(seatNumber + i), "Booked"));
+                    seatsRow.add(new Seat(String.valueOf(seatNumber + i), "Booked"));
                 } else
-                    seatsLeftRow.add(new Seat(String.valueOf(seatNumber + i), "Available"));
-                leftSeatsAdapter.notifyDataSetChanged();
+                    seatsRow.add(new Seat(String.valueOf(seatNumber + i), "Available"));
+                seatsAdapter.notifyDataSetChanged();
             }
             seatNumber -= 4;
         }
 
+        seatsAdapter.setSeatSelectListener(new SeatSelectListener() {
+            @Override
+            public void onChange(int n) {
+                numSeatsSelected = n;
+                int fare = numSeatsSelected * 500;
+                fareTextView.setText("Rs. " + fare);
+            }
+        });
 
-        rightSeatsAdapter = new SeatsAdapter(getApplicationContext(), seatsRightRow);
+        Checkout.preload(getApplicationContext());
+
     }
+
 }

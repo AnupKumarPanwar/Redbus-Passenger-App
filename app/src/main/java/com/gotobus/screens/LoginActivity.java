@@ -2,8 +2,8 @@ package com.gotobus.screens;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,11 +14,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.gotobus.utility.NetworkCookies;
 import com.gotobus.R;
+import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
@@ -65,6 +64,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 phone = phoneInput.getText().toString();
+                if (phone.contains("+91")) {
+                    phone = phone.replace("+91", "");
+                }
 
                 AndroidNetworking.post(baseUrl + "/login.php")
                         .setOkHttpClient(NetworkCookies.okHttpClient)
@@ -86,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             @Override
                             public void onError(ANError error) {
-                                Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
                             }
                         });
             }

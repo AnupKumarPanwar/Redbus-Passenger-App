@@ -1,8 +1,8 @@
 package com.gotobus.screens;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,11 +14,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.gotobus.utility.NetworkCookies;
 import com.gotobus.R;
+import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class SignupActivity extends AppCompatActivity {
@@ -63,6 +62,11 @@ public class SignupActivity extends AppCompatActivity {
                 email = emailInput.getText().toString();
                 age = ageInput.getText().toString();
                 type = gender.getSelectedItem().toString();
+
+                phone = phoneInput.getText().toString();
+                if (phone.contains("+91")) {
+                    phone = phone.replace("+91", "");
+                }
 
                 if (!type.equals("Gender")) {
 

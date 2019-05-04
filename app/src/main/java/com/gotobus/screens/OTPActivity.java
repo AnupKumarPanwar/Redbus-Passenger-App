@@ -17,7 +17,6 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.gotobus.R;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
-import com.gotobus.utility.UserVariables;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,7 +74,6 @@ public class OTPActivity extends AppCompatActivity {
                                         String access_token = data.get("access_token").toString();
                                         editor.putString("access_token", access_token);
                                         editor.commit();
-                                        UserVariables.accessToken = access_token;
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);

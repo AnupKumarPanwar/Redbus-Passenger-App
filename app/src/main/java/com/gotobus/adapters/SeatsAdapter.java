@@ -11,17 +11,26 @@ import android.widget.TextView;
 
 import com.gotobus.R;
 import com.gotobus.classes.Seat;
+import com.gotobus.interfaces.SeatSelectListener;
 
 import java.util.ArrayList;
 
 public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder> {
     Context context;
     ArrayList<Seat> seats;
+    int numSeatsSelected;
+
+    private SeatSelectListener seatSelectListener;
+
 
     public SeatsAdapter(Context context, ArrayList<Seat> seats) {
         this.context = context;
         this.seats = seats;
+        this.numSeatsSelected = 0;
+    }
 
+    public void setSeatSelectListener(SeatSelectListener seatSelectListener) {
+        this.seatSelectListener = seatSelectListener;
     }
 
     @Override
@@ -51,10 +60,20 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
                 if (seats.get(position).status.equals("Selected")) {
                     holder.container.setBackgroundColor(Color.TRANSPARENT);
                     seats.get(position).setStatus("Available");
+                    --numSeatsSelected;
+                    if (seatSelectListener != null) {
+                        seatSelectListener.onChange(numSeatsSelected);
+                    }
+
 
                 } else if (seats.get(position).status.equals("Available")) {
                     holder.container.setBackgroundColor(Color.parseColor("#22ee33"));
                     seats.get(position).setStatus("Selected");
+                    ++numSeatsSelected;
+                    if (seatSelectListener != null) {
+                        seatSelectListener.onChange(numSeatsSelected);
+                    }
+
                 }
             }
         });
