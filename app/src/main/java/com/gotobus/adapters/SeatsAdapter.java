@@ -12,13 +12,15 @@ import android.widget.TextView;
 import com.gotobus.R;
 import com.gotobus.classes.Seat;
 import com.gotobus.interfaces.SeatSelectListener;
+import com.gotobus.utility.Journey;
 
 import java.util.ArrayList;
 
 public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder> {
-    Context context;
-    ArrayList<Seat> seats;
-    int numSeatsSelected;
+    private final Context context;
+    private final ArrayList<Seat> seats;
+    private final ArrayList<String> selectedSeats;
+    private int numSeatsSelected;
 
     private SeatSelectListener seatSelectListener;
 
@@ -27,6 +29,8 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
         this.context = context;
         this.seats = seats;
         this.numSeatsSelected = 0;
+        this.selectedSeats = new ArrayList<>();
+
     }
 
     public void setSeatSelectListener(SeatSelectListener seatSelectListener) {
@@ -50,7 +54,7 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
         if (seats.get(position).status.equals("Booked")) {
             holder.container.setBackgroundColor(Color.GRAY);
         }
-        if (seats.get(position).status.equals("Blank")){
+        if (seats.get(position).status.equals("Blank")) {
             holder.container.setVisibility(View.GONE);
         }
         holder.container.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +65,7 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
                     holder.container.setBackgroundColor(Color.TRANSPARENT);
                     seats.get(position).setStatus("Available");
                     --numSeatsSelected;
+                    selectedSeats.remove(seats.get(position).id);
                     if (seatSelectListener != null) {
                         seatSelectListener.onChange(numSeatsSelected);
                     }
@@ -70,11 +75,14 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
                     holder.container.setBackgroundColor(Color.parseColor("#22ee33"));
                     seats.get(position).setStatus("Selected");
                     ++numSeatsSelected;
+                    selectedSeats.add(seats.get(position).id);
                     if (seatSelectListener != null) {
                         seatSelectListener.onChange(numSeatsSelected);
                     }
 
                 }
+
+                Journey.seats = selectedSeats;
             }
         });
     }
@@ -90,10 +98,10 @@ public class SeatsAdapter extends RecyclerView.Adapter<SeatsAdapter.MyViewHolder
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView seatNumber;
-        RelativeLayout container;
+        final TextView seatNumber;
+        final RelativeLayout container;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             seatNumber = itemView.findViewById(R.id.seat_number);
             container = itemView.findViewById(R.id.container);
