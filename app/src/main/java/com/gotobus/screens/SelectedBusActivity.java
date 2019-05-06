@@ -1,5 +1,6 @@
 package com.gotobus.screens;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,7 +19,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -42,6 +42,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.gotobus.R;
 import com.gotobus.utility.CustomMapUtils;
+import com.gotobus.utility.DownloadTask;
 import com.gotobus.utility.Journey;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
@@ -51,6 +52,8 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+
+import es.dmoral.toasty.Toasty;
 
 import static com.gotobus.utility.Journey.destinationLat;
 import static com.gotobus.utility.Journey.destinationLng;
@@ -62,7 +65,7 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1, PERMISSION_REQUEST_PHONE_CALL = 2;
     private final LatLng mDefaultLocation = new LatLng(28.7041, 77.1025);
-    private GoogleMap mMap;
+    public static GoogleMap mMap;
     private boolean mLocationPermissionGranted, mCallPermissionGranted;
     private Location mLastKnownLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -99,6 +102,8 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
     private String dropoffAddress;
     private SharedPreferences sharedPreferences;
     private String accessToken;
+    private ProgressDialog progressDialog;
+    private String lineColor;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -109,6 +114,10 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Creating boarding points...");
+        progressDialog.show();
 
         baseUrl = getResources().getString(R.string.base_url);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -236,16 +245,31 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                                     mMap.animateCamera(cu);
 
+                                    progressDialog.hide();
+
+                                    lineColor = "#000000";
+
+                                    JSONObject route = data.getJSONObject("route");
+                                    String waypoints;
+                                    waypoints = route.get("waypoints").toString();
+
+                                    String url = customMapUtils.getDirectionsUrl(pickupLatLng, dropoffLatLng, waypoints);
+                                    DownloadTask downloadTask = new DownloadTask(lineColor, "SelectedBusActivity");
+                                    downloadTask.execute(url);
+//                                    downloadTask.addPolylinesOnMap(mMap);
+//                                    mMap.addPolyline(lineOptions);
                                 }
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            progressDialog.hide();
+                            Toasty.error(getApplicationContext(), e.getMessage(), Toasty.LENGTH_LONG).show();
                         }
                     }
 
                     @Override
                     public void onError(ANError error) {
-                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+                        progressDialog.hide();
+                        Toasty.error(getApplicationContext(), error.getMessage(), Toasty.LENGTH_LONG).show();
                     }
                 });
     }
