@@ -13,7 +13,7 @@
         android:left="0dp"
         android:right="0dp"
         android:top="0dp">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+        <shape>
             <solid android:color="#FFFFFF" />
             <corners android:radius="20dp" />
             <padding

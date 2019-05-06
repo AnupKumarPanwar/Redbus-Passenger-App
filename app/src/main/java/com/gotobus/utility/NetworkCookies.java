@@ -10,7 +10,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 public class NetworkCookies {
-    public static CookieJar cookieJar = new CookieJar() {
+    private static final CookieJar cookieJar = new CookieJar() {
 
         private final HashMap<String, List<Cookie>> cookieStore = new HashMap<>();
 
@@ -27,7 +27,7 @@ public class NetworkCookies {
         }
     };
 
-    public static OkHttpClient okHttpClient = new OkHttpClient.Builder()
+    public static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .cookieJar(cookieJar)
             .build();
 }

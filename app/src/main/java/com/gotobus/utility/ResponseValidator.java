@@ -2,7 +2,6 @@ package com.gotobus.utility;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,10 +31,10 @@ public class ResponseValidator {
                 String message = result.get("message").toString();
                 if (message.equals("Invalid access token.")) {
                     editor.putString("access_token", null);
-                    editor.commit();
+                    editor.apply();
                     final Intent intent = new Intent(activity.getApplicationContext(), LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    Toasty.error(activity, "Session expired. Please login again!", Toast.LENGTH_SHORT, true).show();
+//                    Toasty.error(activity, "Session expired. Please login again!", Toast.LENGTH_SHORT, true).show();
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
                     alertDialogBuilder.setCancelable(false);
                     alertDialogBuilder.setMessage("Session expired. Please login again!");

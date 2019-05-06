@@ -8,14 +8,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gotobus.classes.Cashback;
 import com.gotobus.R;
+import com.gotobus.classes.Cashback;
 
 import java.util.ArrayList;
 
 public class CashbacksAdapter extends BaseAdapter {
-    Context context;
-    ArrayList<Cashback> cashbacks;
+    private final Context context;
+    private final ArrayList<Cashback> cashbacks;
 
     public CashbacksAdapter(Context context, ArrayList<Cashback> cashbacks) {
         this.context = context;

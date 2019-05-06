@@ -22,15 +22,13 @@ import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText phoneInput;
-    Button loginButton;
-    TextView signupButton;
-
-    String phone;
-    String baseUrl;
-
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
+    private final String PREFS_NAME = "MyApp_Settings";
+    private EditText phoneInput;
+    private Button loginButton;
+    private TextView signupButton;
+    private String phone;
+    private String baseUrl;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

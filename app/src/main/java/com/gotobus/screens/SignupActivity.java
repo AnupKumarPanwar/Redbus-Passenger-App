@@ -22,17 +22,24 @@ import org.json.JSONObject;
 
 public class SignupActivity extends AppCompatActivity {
 
-    Spinner gender;
-    String[] genders;
-    ArrayAdapter<String> adapter;
+    private Spinner gender;
+    private String[] genders;
+    private ArrayAdapter<String> adapter;
 
-    EditText phoneInput, nameInput, emailInput, ageInput;
+    private EditText phoneInput;
+    private EditText nameInput;
+    private EditText emailInput;
+    private EditText ageInput;
 
-    Button signupButton;
+    private Button signupButton;
 
-    String baseUrl;
+    private String baseUrl;
 
-    String phone, name, email, age, type;
+    private String phone;
+    private String name;
+    private String email;
+    private String age;
+    private String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,7 +1,8 @@
 package com.gotobus.classes;
 
 public class Seat {
-    public String id, status;
+    public final String id;
+    public String status;
 
     public Seat(String id, String status) {
         this.id = id;

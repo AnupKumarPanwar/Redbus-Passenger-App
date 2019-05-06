@@ -2,8 +2,8 @@ package com.gotobus.screens;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,28 +15,31 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.gotobus.utility.NetworkCookies;
 import com.gotobus.R;
+import com.gotobus.utility.NetworkCookies;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    Spinner gender;
-    String[] genders;
-    ArrayAdapter<String> adapter;
-
-    EditText phoneInput, nameInput, emailInput, ageInput;
-
-    Button signupButton;
-
-    String baseUrl;
-    String accessToken;
-    SharedPreferences sharedPreferences;
-
-    String phone, name, email, age, type;
-    String PREFS_NAME = "MyApp_Settings";
+    private final String PREFS_NAME = "MyApp_Settings";
+    private Spinner gender;
+    private String[] genders;
+    private ArrayAdapter<String> adapter;
+    private EditText phoneInput;
+    private EditText nameInput;
+    private EditText emailInput;
+    private EditText ageInput;
+    private Button signupButton;
+    private String baseUrl;
+    private String accessToken;
+    private SharedPreferences sharedPreferences;
+    private String phone;
+    private String name;
+    private String email;
+    private String age;
+    private String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

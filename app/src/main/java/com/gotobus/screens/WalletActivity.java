@@ -29,10 +29,10 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.anupkumarpanwar.scratchview.ScratchView;
+import com.gotobus.R;
 import com.gotobus.adapters.CashbacksAdapter;
 import com.gotobus.classes.Cashback;
 import com.gotobus.utility.NetworkCookies;
-import com.gotobus.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,38 +41,37 @@ import java.util.ArrayList;
 
 public class WalletActivity extends AppCompatActivity {
 
-    String baseUrl;
+    private final String PREFS_NAME = "MyApp_Settings";
+    private final int shortAnimationDuration = 200;
+    private String baseUrl;
+    private SharedPreferences sharedPreferences;
+    private String accessToken;
+    private ArrayList<Cashback> cashbacks;
+    private Cashback selectedCashback;
+    private CashbacksAdapter cashbacksAdapter;
+    private GridView gridView;
+    private Animator currentAnimator;
+    private float startScaleFinal;
+    private ScratchView scratchView;
+    private boolean expanded = false;
 
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
-    String accessToken;
-
-    ArrayList<Cashback> cashbacks;
-    Cashback selectedCashback;
-    CashbacksAdapter cashbacksAdapter;
-    GridView gridView;
-    Animator currentAnimator;
-    int shortAnimationDuration = 200;
-    float startScaleFinal;
-    ScratchView scratchView;
-    boolean expanded = false;
-
-    TextView amount, credits;
+    private TextView amount;
+    private TextView credits;
 
     // Load the high-resolution "zoomed-in" image.
-    RelativeLayout expandedImageView;
+    private RelativeLayout expandedImageView;
     //        expandedImageView.setImageResource(imageResId);
-    ImageView imageView;
+    private ImageView imageView;
 
     // Calculate the starting and ending bounds for the zoomed-in image.
     // This step involves lots of math. Yay, math.
-    Rect startBounds;
-    Rect finalBounds;
-    Point globalOffset;
-    float startScale;
-    View thumbView;
+    private Rect startBounds;
+    private Rect finalBounds;
+    private Point globalOffset;
+    private float startScale;
+    private View thumbView;
 
-    int totalCredits = 0;
+    private int totalCredits = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override

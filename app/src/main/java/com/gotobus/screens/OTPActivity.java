@@ -21,21 +21,19 @@ import com.gotobus.utility.ResponseValidator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class OTPActivity extends AppCompatActivity {
 
-    EditText otpInput;
-    Button verifyButton;
-
-    String otp;
-
-    String baseUrl;
-
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
-    String PREFS_NAME = "MyApp_Settings";
-
-    String phone;
-    TextView resendOtp;
+    private final String PREFS_NAME = "MyApp_Settings";
+    private EditText otpInput;
+    private Button verifyButton;
+    private String otp;
+    private String baseUrl;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private String phone;
+    private TextView resendOtp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +49,7 @@ public class OTPActivity extends AppCompatActivity {
         verifyButton = findViewById(R.id.verify);
         resendOtp = findViewById(R.id.resend_otp);
 
-        phone = getIntent().getExtras().getString("phone", null);
+        phone = Objects.requireNonNull(getIntent().getExtras()).getString("phone", null);
 
 
         verifyButton.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +71,7 @@ public class OTPActivity extends AppCompatActivity {
                                         JSONObject data = result.getJSONObject("data");
                                         String access_token = data.get("access_token").toString();
                                         editor.putString("access_token", access_token);
-                                        editor.commit();
+                                        editor.apply();
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);

@@ -14,10 +14,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.gotobus.utility.NetworkCookies;
 import com.gotobus.R;
-import com.gotobus.classes.Trip;
 import com.gotobus.adapters.TripsAdapter;
+import com.gotobus.classes.Trip;
+import com.gotobus.utility.NetworkCookies;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,14 +28,14 @@ import java.util.Locale;
 
 public class TripsActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    TripsAdapter tripsAdapter;
-    ArrayList<Trip> trips;
-    String accessToken;
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
-    String baseUrl;
-    Geocoder geocoder;
+    private final String PREFS_NAME = "MyApp_Settings";
+    private RecyclerView recyclerView;
+    private TripsAdapter tripsAdapter;
+    private ArrayList<Trip> trips;
+    private String accessToken;
+    private SharedPreferences sharedPreferences;
+    private String baseUrl;
+    private Geocoder geocoder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -35,7 +35,10 @@
                 android:paddingTop="5dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="5dp"
-                android:textSize="15sp" />
+                android:importantForAutofill="no"
+                android:inputType=""
+                android:textSize="15sp"
+                tools:targetApi="o" />
 
             <View
                 android:layout_width="7dp"
@@ -61,6 +64,8 @@
                 android:paddingTop="5dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="5dp"
+                android:importantForAutofill="no"
+                android:inputType=""
                 android:textSize="15sp" />
 
             <View
@@ -72,8 +77,7 @@
         </RelativeLayout>
 
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+        <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
@@ -97,6 +101,7 @@
             android:layout_height="90dp"
             android:gravity="center"
             android:orientation="horizontal"
+            android:baselineAligned="false"
             android:weightSum="3">
 
             <LinearLayout
@@ -130,6 +135,7 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:contentDescription="TODO"
                     android:src="@drawable/sleeper" />
 
                 <TextView
@@ -172,6 +178,7 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:contentDescription="TODO"
                     android:src="@drawable/ac" />
 
                 <TextView
@@ -214,6 +221,7 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:contentDescription="TODO"
                     android:src="@drawable/volvo" />
 
                 <TextView
@@ -321,6 +329,7 @@
                 android:id="@+id/call_bus"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:contentDescription="TODO"
                 android:src="@drawable/ic_phone_in_talk_black_24dp" />
 
             <LinearLayout

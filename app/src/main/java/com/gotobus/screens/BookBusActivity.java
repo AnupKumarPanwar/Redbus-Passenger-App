@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,8 +19,8 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.gotobus.utility.NetworkCookies;
 import com.gotobus.R;
+import com.gotobus.utility.NetworkCookies;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,21 +30,31 @@ import java.util.Date;
 
 public class BookBusActivity extends AppCompatActivity {
 
-    TextView name, number, phone, arrivalTime, departureTime, pickupAddress, dropAddress, price;
-    Button confirmBooking;
-    String busId, routeId;
-    int eta = 0;
-
-    String source = "", destinataion = "";
-    Calendar calendar;
-    String baseUrl;
-
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
-    String accessToken;
-    SharedPreferences.Editor editor;
-    ProgressDialog progressDialog;
-    String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
+    private final String PREFS_NAME = "MyApp_Settings";
+    TextView price;
+    private TextView name;
+    private TextView number;
+    private TextView phone;
+    private TextView arrivalTime;
+    private TextView departureTime;
+    private TextView pickupAddress;
+    private TextView dropAddress;
+    private Button confirmBooking;
+    private String busId;
+    private String routeId;
+    private int eta = 0;
+    private String source = "";
+    private String destinataion = "";
+    private Calendar calendar;
+    private String baseUrl;
+    private SharedPreferences sharedPreferences;
+    private String accessToken;
+    private SharedPreferences.Editor editor;
+    private ProgressDialog progressDialog;
+    private String nearestSourceLat;
+    private String nearestSourceLong;
+    private String nearestDestinationLat;
+    private String nearestDestinationLong;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -103,7 +113,7 @@ public class BookBusActivity extends AppCompatActivity {
                                         String message = result.get("message").toString();
                                         if (message.equals("Invalid access token.")) {
                                             editor.putString("access_token", null);
-                                            editor.commit();
+                                            editor.apply();
                                             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             startActivity(intent);
@@ -128,7 +138,7 @@ public class BookBusActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd:hh:mm aa");
         String currentDateandTime = sdf.format(new Date());
 
-        Date date = null;
+        Date date;
 
 
         if (getIntent().getExtras() != null) {
@@ -167,12 +177,12 @@ public class BookBusActivity extends AppCompatActivity {
             routeId = data.getString("route_id");
         }
 
-        setETA(source, destinataion, "");
+        setETA(source, destinataion);
 
     }
 
-    private void setETA(String origin, String dest, String waypoints) {
-        String url = getDirectionsUrl(origin, dest, waypoints);
+    private void setETA(String origin, String dest) {
+        String url = getDirectionsUrl(origin, dest, "");
         AndroidNetworking.get(url)
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .build()
@@ -197,7 +207,7 @@ public class BookBusActivity extends AppCompatActivity {
                                 }
 
                             }
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
 
                         }
                     }
@@ -232,10 +242,9 @@ public class BookBusActivity extends AppCompatActivity {
         String output = "json";
 
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
 
 
-        return url;
+        return "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
     }
 
     @Override

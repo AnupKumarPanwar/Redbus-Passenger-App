@@ -25,6 +25,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="25dp"
+                android:contentDescription="TODO"
                 android:src="@drawable/seatbelt" />
         </LinearLayout>
     </ScrollView>
@@ -50,7 +51,6 @@
             android:id="@+id/book_confirm"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:layout_alignParentBottom="true"
             android:layout_weight="3"
             android:background="@drawable/orange_rect_button"
             android:gravity="center"

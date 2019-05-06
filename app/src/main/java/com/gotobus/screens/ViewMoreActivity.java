@@ -25,6 +25,7 @@ import com.gotobus.utility.ResponseValidator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,19 +33,25 @@ import java.util.Date;
 
 public class ViewMoreActivity extends AppCompatActivity {
 
-    TextView tripDate;
-    int mYear, mMonth, mDay, mHour, mMinute;
+    private final String PREFS_NAME = "MyApp_Settings";
+    int mHour;
+    int mMinute;
+    private TextView tripDate;
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+    private RecyclerView recyclerView;
+    private BusesAdapter busesAdapter;
+    private ArrayList<Bus> buses;
+    private String accessToken;
+    private SharedPreferences sharedPreferences;
+    private String baseUrl;
 
-    RecyclerView recyclerView;
-    BusesAdapter busesAdapter;
-    ArrayList<Bus> buses;
-    String accessToken;
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
-    String baseUrl;
-
-    String sourceLat, sourceLng, destinationLat, destinationLng;
-
+    private String sourceLat;
+    private String sourceLng;
+    private String destinationLat;
+    private String destinationLng;
+    private Calendar c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +67,21 @@ public class ViewMoreActivity extends AppCompatActivity {
         destinationLat = Journey.destinationLat;
         destinationLng = Journey.destinationLng;
 
+        tripDate = findViewById(R.id.trip_date);
+        c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        String formattedDate = df.format(c.getTime());
+        tripDate.setText(formattedDate + " \uD83D\uDD3B");
+        Journey.journeyDate = formattedDate;
+
+
 //        Toast.makeText(getApplicationContext(), destinationLng.toString(), Toast.LENGTH_LONG).show();
         searchBuses();
 
-        tripDate = findViewById(R.id.trip_date);
         tripDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Calendar c = Calendar.getInstance();
+                c = Calendar.getInstance();
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
@@ -75,8 +89,27 @@ public class ViewMoreActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         String sDayOfMonth = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
+                        month = month + 1;
                         String sMonth = month < 10 ? "0" + month : String.valueOf(month);
-                        tripDate.setText(sDayOfMonth + "/" + sMonth + "/" + year + " \uD83D\uDD3B");
+
+                        String dateStr = sDayOfMonth + "/" + sMonth + "/" + year;
+
+
+                        try {
+                            SimpleDateFormat curFormater = new SimpleDateFormat("dd/MM/yyyy");
+                            Date dateObj;
+                            dateObj = curFormater.parse(dateStr);
+                            SimpleDateFormat postFormater = new SimpleDateFormat("dd-MMM-yyyy");
+                            String formattedDate = postFormater.format(dateObj);
+                            tripDate.setText(formattedDate + " \uD83D\uDD3B");
+                            Journey.journeyDate = formattedDate;
+
+                        } catch (ParseException e) {
+                            tripDate.setText(dateStr + " \uD83D\uDD3B");
+                            Journey.journeyDate = dateStr;
+
+                        }
+
                     }
                 }, mYear, mMonth, mDay);
                 datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());

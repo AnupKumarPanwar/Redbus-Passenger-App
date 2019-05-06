@@ -42,8 +42,6 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
@@ -68,7 +66,6 @@ import com.gotobus.utility.DirectionsJSONParser;
 import com.gotobus.utility.Journey;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
-import com.gotobus.utility.UserVariables;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,6 +81,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
 
@@ -100,54 +98,74 @@ public class MainActivity extends AppCompatActivity
     private Location mLastKnownLocation;
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private CameraPosition mCameraPosition;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    MarkerOptions sourceMarkerOption, destinationMarkerOption, busMarker;
-    String nearestSourceLat, nearestSourceLong, nearestDestinationLat, nearestDestinationLong;
-    MarkerOptions nearestSourceOption, nearestDestinationOption;
-    String pickupAddress = "Pickup point";
-    String dropAddress = "Drop-off point";
-    String[] busSource;
-    String[] busDestination;
+    private final int AUTOCOMPLETE_SOURCE = 1;
+    private final int AUTOCOMPLETE_DESTINATION = 2;
+    private final String busType = "";
+    private final String PREFS_NAME = "MyApp_Settings";
+    Marker sourceMarker;
+    Marker destinationMarker;
+    private MarkerOptions sourceMarkerOption;
+    private MarkerOptions destinationMarkerOption;
+    private MarkerOptions busMarker;
+    private String nearestSourceLat;
+    private String nearestSourceLong;
+    private String nearestDestinationLat;
+    private String nearestDestinationLong;
+    private MarkerOptions nearestSourceOption;
+    private MarkerOptions nearestDestinationOption;
+    private String pickupAddress = "Pickup point";
+    private String dropAddress = "Drop-off point";
+    private String[] busSource;
+    private String[] busDestination;
+    private EditText sourceAddress;
+    private EditText destinationAddress;
+    private LinearLayout container;
+    private LinearLayout sleeper;
+    private LinearLayout ac;
+    private LinearLayout volvo;
+    private LinearLayout busInfo;
+    private LinearLayout bookingOptions;
+    private String baseUrl;
+    private String lineColor = "#0fa4e6";
+    private Button bookNow;
+    private Button viewMore;
+    private String busName = "";
+    private String busNumber = "";
+    private String busPhone = "";
+    private String busId = "";
+    private String routeId = "";
+    private String bookedBusType = "";
+    private String otp = "";
+    private String fare = "";
+    private SharedPreferences sharedPreferences;
+    private String accessToken;
+    private SharedPreferences.Editor editor;
+    private String eta = "";
+    private int etaValue = 0;
+    private TextView sleeperETA;
+    private TextView acETA;
+    private TextView volvoETA;
+    private TextView cancelBus;
+    private ProgressDialog progressDialog;
+    private Handler handler;
+    private Runnable getBusLocationRunnable;
+    private boolean tripCompleted = false;
+    private Marker currentBusMarker;
+    private boolean busSelected = false;
 
-    int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION = 2;
+    private TextView busNameView;
+    private TextView busNumberView;
+    private TextView fareView;
+    private TextView otpView;
+    private TextView etaView;
+    private ImageView callBus;
+    private Runnable adjustZoomLevel;
 
-    EditText sourceAddress, destinationAddress;
-
-    LinearLayout container, sleeper, ac, volvo, busInfo, bookingOptions;
-    String baseUrl;
-
-    String lineColor = "#0fa4e6";
-
-    Button bookNow, viewMore;
-
-    String busName = "", busNumber = "", busPhone = "", busId = "", routeId = "", busType = "", bookedBusType = "", otp = "", fare = "";
-
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
-    String accessToken;
-    SharedPreferences.Editor editor;
-
-    String eta = "";
-    int etaValue = 0;
-    TextView sleeperETA, acETA, volvoETA, cancelBus;
-
-    ProgressDialog progressDialog;
-    Handler handler;
-    Runnable getBusLocationRunnable;
-    boolean tripCompleted = false;
-    Marker currentBusMarker, sourceMarker, destinationMarker;
-    boolean busSelected = false;
-
-    TextView busNameView, busNumberView, fareView, otpView, etaView;
-    ImageView callBus;
-    Runnable adjustZoomLevel;
-
-    UserVariables userVariables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +177,7 @@ public class MainActivity extends AppCompatActivity
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+            CameraPosition mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
 //        getSupportActionBar().setDisplayShowTitleEnabled(true);
@@ -179,7 +197,6 @@ public class MainActivity extends AppCompatActivity
         editor = sharedPreferences.edit();
         accessToken = sharedPreferences.getString("access_token", null);
 
-        userVariables = new UserVariables(getApplicationContext());
 
         AndroidNetworking.initialize(getApplicationContext());
 
@@ -265,7 +282,7 @@ public class MainActivity extends AppCompatActivity
                     editor.putString("source_address", sourceAddress.getText().toString());
                     editor.putString("destination_address", destinationAddress.getText().toString());
 
-                    editor.commit();
+                    editor.apply();
 
                     Intent intent = new Intent(getApplicationContext(), BookBusActivity.class);
                     intent.putExtra("name", busName);
@@ -300,10 +317,8 @@ public class MainActivity extends AppCompatActivity
                 try {
                     PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                     startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_SOURCE);
-                } catch (GooglePlayServicesRepairableException e) {
-                    Log.e("Exception", e.getMessage());
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.e("Exception", e.getMessage());
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -315,10 +330,8 @@ public class MainActivity extends AppCompatActivity
                     try {
                         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                         startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_SOURCE);
-                    } catch (GooglePlayServicesRepairableException e) {
-                        Log.e("Exception", e.getMessage());
-                    } catch (GooglePlayServicesNotAvailableException e) {
-                        Log.e("Exception", e.getMessage());
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -331,10 +344,8 @@ public class MainActivity extends AppCompatActivity
                 try {
                     PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                     startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_DESTINATION);
-                } catch (GooglePlayServicesRepairableException e) {
-                    Log.e("Exception", e.getMessage());
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.e("Exception", e.getMessage());
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -346,10 +357,8 @@ public class MainActivity extends AppCompatActivity
                     try {
                         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                         startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_DESTINATION);
-                    } catch (GooglePlayServicesRepairableException e) {
-                        Log.e("Exception", e.getMessage());
-                    } catch (GooglePlayServicesNotAvailableException e) {
-                        Log.e("Exception", e.getMessage());
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -547,11 +556,11 @@ public class MainActivity extends AppCompatActivity
         }
         progressDialog.show();
         mMap.clear();
-        String url = "";
+        String url;
         if (booked) {
             url = baseUrl + "/checkBooking.php";
-            String[] source = sharedPreferences.getString("source", "").split(",");
-            String[] destination = sharedPreferences.getString("destination", "").split(",");
+            String[] source = Objects.requireNonNull(sharedPreferences.getString("source", "")).split(",");
+            String[] destination = Objects.requireNonNull(sharedPreferences.getString("destination", "")).split(",");
 
             sourceAddress.setText(sharedPreferences.getString("source_address", ""));
             destinationAddress.setText(sharedPreferences.getString("destination_address", ""));
@@ -596,7 +605,7 @@ public class MainActivity extends AppCompatActivity
 
                                 nearestDestinationLat = data.getJSONArray("nearestDestination").get(0).toString();
                                 nearestDestinationLong = data.getJSONArray("nearestDestination").get(1).toString();
-                                String waypoints = "";
+                                String waypoints;
                                 otp = data.get("otp").toString();
                                 fare = data.get("fare").toString();
                                 JSONObject route = data.getJSONObject("route");
@@ -752,24 +761,28 @@ public class MainActivity extends AppCompatActivity
                                 LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
 //                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
                                 float bearing = Float.parseFloat(data.get("bearing").toString());
-                                if (busType.equals("Sleeper")) {
-                                    busMarker = new MarkerOptions()
-                                            .position(origin)
-                                            .flat(true)
-                                            .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
-                                } else if (busType.equals("AC")) {
-                                    busMarker = new MarkerOptions()
-                                            .position(origin)
-                                            .flat(true)
-                                            .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
-                                } else if (busType.equals("Volvo")) {
-                                    busMarker = new MarkerOptions()
-                                            .position(origin)
-                                            .flat(true)
-                                            .rotation(bearing)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
+                                switch (busType) {
+                                    case "Sleeper":
+                                        busMarker = new MarkerOptions()
+                                                .position(origin)
+                                                .flat(true)
+                                                .rotation(bearing)
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.sleeper_bus_marker));
+                                        break;
+                                    case "AC":
+                                        busMarker = new MarkerOptions()
+                                                .position(origin)
+                                                .flat(true)
+                                                .rotation(bearing)
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ac_bus_marker));
+                                        break;
+                                    case "Volvo":
+                                        busMarker = new MarkerOptions()
+                                                .position(origin)
+                                                .flat(true)
+                                                .rotation(bearing)
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.volvo_bus_marker));
+                                        break;
                                 }
 
 //                                Toast.makeText(getApplicationContext(), String.valueOf("test"), Toast.LENGTH_LONG).show();
@@ -801,12 +814,16 @@ public class MainActivity extends AppCompatActivity
                                                         if (legs.length() > 0) {
                                                             eta = legs.getJSONObject(0).getJSONObject("duration").get("text").toString();
                                                             etaValue = Integer.parseInt(legs.getJSONObject(0).getJSONObject("duration").get("value").toString());
-                                                            if (busType.equals("Sleeper")) {
-                                                                sleeperETA.setText(eta);
-                                                            } else if (busType.equals("AC")) {
-                                                                acETA.setText(eta);
-                                                            } else if (busType.equals("Volvo")) {
-                                                                volvoETA.setText(eta);
+                                                            switch (busType) {
+                                                                case "Sleeper":
+                                                                    sleeperETA.setText(eta);
+                                                                    break;
+                                                                case "AC":
+                                                                    acETA.setText(eta);
+                                                                    break;
+                                                                case "Volvo":
+                                                                    volvoETA.setText(eta);
+                                                                    break;
                                                             }
 
 //                                                            Log.d("route", String.valueOf(response));
@@ -858,7 +875,7 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == AUTOCOMPLETE_SOURCE) {
             if (resultCode == RESULT_OK) {
                 busSelected = false;
-                Place place = PlacePicker.getPlace(getApplicationContext(), data);
+                Place place = PlacePicker.getPlace(getApplicationContext(), Objects.requireNonNull(data));
                 sourceAddress.setText(place.getAddress());
 
                 mMap.clear();
@@ -908,7 +925,7 @@ public class MainActivity extends AppCompatActivity
         } else if (requestCode == AUTOCOMPLETE_DESTINATION) {
             if (resultCode == RESULT_OK) {
                 busSelected = false;
-                Place place = PlacePicker.getPlace(getApplicationContext(), data);
+                Place place = PlacePicker.getPlace(getApplicationContext(), Objects.requireNonNull(data));
                 destinationAddress.setText(place.getAddress());
 
                 mMap.clear();
@@ -986,8 +1003,7 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
+        //        if (id == R.id.action_settings) {
 //            return true;
 //        }
 
@@ -1205,15 +1221,52 @@ public class MainActivity extends AppCompatActivity
         return url;
     }
 
+    /**
+     * A method to download json data from url
+     */
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuilder sb = new StringBuilder();
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Download Exception", e.toString());
+        } finally {
+            Objects.requireNonNull(iStream).close();
+            Objects.requireNonNull(urlConnection).disconnect();
+        }
+        return data;
+    }
 
     /**
      * A class to parse the Google Places in JSON format
      */
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
-        String lineColor;
+        final String lineColor;
 
-        public ParserTask(String lineColor) {
+        ParserTask(String lineColor) {
             this.lineColor = lineColor;
         }
 
@@ -1240,7 +1293,7 @@ public class MainActivity extends AppCompatActivity
             if (result == null) {
                 return;
             }
-            ArrayList points = null;
+            ArrayList points;
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
 
@@ -1253,8 +1306,8 @@ public class MainActivity extends AppCompatActivity
                 for (int j = 0; j < path.size(); j++) {
                     HashMap<String, String> point = path.get(j);
 
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
+                    double lat = Double.parseDouble(Objects.requireNonNull(point.get("lat")));
+                    double lng = Double.parseDouble(Objects.requireNonNull(point.get("lng")));
                     LatLng position = new LatLng(lat, lng);
 
                     points.add(position);
@@ -1276,48 +1329,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * A method to download json data from url
-     */
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(strUrl);
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            urlConnection.connect();
-
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb = new StringBuffer();
-
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            data = sb.toString();
-
-            br.close();
-
-        } catch (Exception e) {
-            Log.d("Download Exception", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
-    }
-
     private class DownloadTask extends AsyncTask<String, Void, String> {
-        String lineColor;
+        final String lineColor;
 
-        public DownloadTask(String lineColor) {
+        DownloadTask(String lineColor) {
             this.lineColor = lineColor;
         }
 

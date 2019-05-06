@@ -8,7 +8,7 @@ import com.gotobus.R;
 
 public class CustomMapUtils {
 
-    Context context;
+    private final Context context;
 
     public CustomMapUtils(Context context) {
         this.context = context;
@@ -18,7 +18,7 @@ public class CustomMapUtils {
         return getDirectionsUrl(origin, dest, "");
     }
 
-    public String getDirectionsUrl(LatLng origin, LatLng dest, String waypoints) {
+    private String getDirectionsUrl(LatLng origin, LatLng dest, String waypoints) {
 
         Log.d("waypoints_url", "getDirectionsUrl: " + waypoints);
 

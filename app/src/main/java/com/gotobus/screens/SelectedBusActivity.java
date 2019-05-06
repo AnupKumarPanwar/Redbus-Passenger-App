@@ -42,6 +42,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.gotobus.R;
 import com.gotobus.utility.CustomMapUtils;
+import com.gotobus.utility.Journey;
 import com.gotobus.utility.NetworkCookies;
 import com.gotobus.utility.ResponseValidator;
 
@@ -49,6 +50,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.gotobus.utility.Journey.destinationLat;
 import static com.gotobus.utility.Journey.destinationLng;
@@ -66,19 +68,37 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private CameraPosition mCameraPosition;
 
-    Button continueToSeatSelection;
-    TextView title, type, fare, arrivalTime, departureTime, pickupPoint, dropoffPoint;
-    String routeId, busName, busType, busFare, busArrivalTime, busDepartureTime, source, destination;
-    CustomMapUtils customMapUtils;
-    String baseUrl;
-    MarkerOptions pickupMarkerOptions, dropoffMarkerOptions;
-    Double pickupLat, pickupLng, dropoffLat, dropoffLng;
-    LatLng pickupLatLng, dropoffLatLng;
-    String pickupAddress, dropoffAddress;
-
-    SharedPreferences sharedPreferences;
-    String PREFS_NAME = "MyApp_Settings";
-    String accessToken;
+    private final String PREFS_NAME = "MyApp_Settings";
+    String source;
+    String destination;
+    private Button continueToSeatSelection;
+    private TextView title;
+    private TextView type;
+    private TextView fare;
+    private TextView arrivalTime;
+    private TextView departureTime;
+    private TextView pickupPoint;
+    private TextView dropoffPoint;
+    private String routeId;
+    private String busName;
+    private String busType;
+    private String busFare;
+    private String busArrivalTime;
+    private String busDepartureTime;
+    private CustomMapUtils customMapUtils;
+    private String baseUrl;
+    private MarkerOptions pickupMarkerOptions;
+    private MarkerOptions dropoffMarkerOptions;
+    private Double pickupLat;
+    private Double pickupLng;
+    private Double dropoffLat;
+    private Double dropoffLng;
+    private LatLng pickupLatLng;
+    private LatLng dropoffLatLng;
+    private String pickupAddress;
+    private String dropoffAddress;
+    private SharedPreferences sharedPreferences;
+    private String accessToken;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -106,21 +126,21 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
         dropoffPoint = findViewById(R.id.dropoff_point);
 
 
-        routeId = getIntent().getExtras().get("route_id").toString();
+        routeId = Objects.requireNonNull(getIntent().getExtras().get("route_id")).toString();
 
-        busName = getIntent().getExtras().get("bus_name").toString();
+        busName = Objects.requireNonNull(getIntent().getExtras().get("bus_name")).toString();
         title.setText(busName);
 
-        busType = getIntent().getExtras().get("bus_type").toString();
+        busType = Objects.requireNonNull(getIntent().getExtras().get("bus_type")).toString();
         type.setText(busType);
 
-        busFare = getIntent().getExtras().get("fare").toString();
+        busFare = Objects.requireNonNull(getIntent().getExtras().get("fare")).toString();
         fare.setText("₹ " + busFare);
 
-        busArrivalTime = getIntent().getExtras().get("arrival_time").toString();
+        busArrivalTime = Objects.requireNonNull(getIntent().getExtras().get("arrival_time")).toString();
         arrivalTime.setText(busArrivalTime);
 
-        busDepartureTime = getIntent().getExtras().get("departure_time").toString();
+        busDepartureTime = Objects.requireNonNull(getIntent().getExtras().get("departure_time")).toString();
         arrivalTime.setText(busArrivalTime);
 
 
@@ -132,7 +152,7 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SeatSelectionActivity.class);
-                String busName = getIntent().getExtras().get("bus_name").toString();
+                String busName = Objects.requireNonNull(getIntent().getExtras().get("bus_name")).toString();
                 intent.putExtra("bus_name", busName);
                 startActivity(intent);
             }
@@ -175,6 +195,7 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                                         Address address = addresses.get(0);
                                         pickupAddress = address.getAddressLine(0);
                                         pickupPoint.setText(pickupAddress);
+                                        Journey.pickupAddress = pickupAddress;
 
                                     } catch (Exception e) {
                                         Log.e("Exception", e.getMessage());
@@ -185,6 +206,8 @@ public class SelectedBusActivity extends AppCompatActivity implements OnMapReady
                                         Address address = addresses.get(0);
                                         dropoffAddress = address.getAddressLine(0);
                                         dropoffPoint.setText(dropoffAddress);
+                                        Journey.dropoffAddress = dropoffAddress;
+
 
                                     } catch (Exception e) {
                                         Log.e("Exception", e.getMessage());

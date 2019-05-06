@@ -13,8 +13,8 @@ import com.gotobus.classes.Trip;
 import java.util.ArrayList;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.MyViewHolder> {
-    Context context;
-    ArrayList<Trip> trips;
+    private final Context context;
+    private final ArrayList<Trip> trips;
 
     public TripsAdapter(Context context, ArrayList<Trip> trips) {
         this.context = context;
@@ -45,9 +45,15 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.MyViewHolder
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView date, fare, bus, type, status, source, destination;
+        final TextView date;
+        final TextView fare;
+        final TextView bus;
+        final TextView type;
+        final TextView status;
+        final TextView source;
+        final TextView destination;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             date = itemView.findViewById(R.id.date);
             fare = itemView.findViewById(R.id.fare);

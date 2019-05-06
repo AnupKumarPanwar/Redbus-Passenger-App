@@ -20,9 +20,9 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.gotobus.R;
 
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult> {
-    protected GoogleApiClient mGoogleApiClient;
-    protected LocationRequest locationRequest;
-    int REQUEST_CHECK_SETTINGS = 100;
+    private final int REQUEST_CHECK_SETTINGS = 100;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest locationRequest;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

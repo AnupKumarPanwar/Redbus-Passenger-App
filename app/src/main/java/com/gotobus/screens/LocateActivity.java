@@ -10,7 +10,7 @@ import com.gotobus.R;
 
 public class LocateActivity extends AppCompatActivity {
 
-    EditText searchBar;
+    private EditText searchBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

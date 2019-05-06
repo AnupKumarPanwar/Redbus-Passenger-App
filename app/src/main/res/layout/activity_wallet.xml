@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -34,6 +35,7 @@
                 android:adjustViewBounds="true"
                 android:cropToPadding="true"
                 android:scaleType="fitXY"
+                android:contentDescription="TODO"
                 android:src="@drawable/wallet_background" />
 
             <TextView
@@ -90,7 +92,8 @@
             android:nestedScrollingEnabled="true"
             android:numColumns="auto_fit"
             android:padding="15dp"
-            android:verticalSpacing="18dp">
+            android:verticalSpacing="18dp"
+            tools:targetApi="lollipop">
 
         </GridView>
 
@@ -109,7 +112,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.95"
-            android:background="#000" />
+            android:background="#000"
+            android:contentDescription="TODO" />
 
         <RelativeLayout
             android:id="@+id/scratch_card_container"
@@ -118,10 +122,10 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="100dp"
             android:gravity="center"
-            android:nestedScrollingEnabled="true">
+            android:nestedScrollingEnabled="true"
+            tools:targetApi="lollipop">
 
             <android.support.v7.widget.CardView
-                android:id="@+id/card_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -137,6 +141,7 @@
                     <ImageView
                         android:layout_width="110dp"
                         android:layout_height="110dp"
+                        android:contentDescription="TODO"
                         android:src="@drawable/trophy" />
 
                     <TextView

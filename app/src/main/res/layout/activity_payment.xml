@@ -6,133 +6,240 @@
     tools:context="com.gotobus.screens.PaymentActivity">
 
     <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingTop="30dp">
+        android:paddingTop="30dp"
+        android:visibility="visible">
 
         <ImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:contentDescription="TODO"
             android:src="@drawable/success" />
+
+        <TextView
+            android:id="@+id/fare"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="Rs. 500"
+            android:textSize="35sp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Booking confirmed with" />
+
+        <TextView
+            android:id="@+id/bus_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Pawan Tour and Travels"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/journey_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:text="3 May 2019" />
+
+
+        <TextView
+            android:id="@+id/information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="Seats booked" />
+
+        <TextView
+            android:id="@+id/seats_booked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="24, 25"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/otp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:text="OTP: 1234"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="7">
+
+                    <TextView
+                        android:id="@+id/departure_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:focusedByDefault="false"
+                        android:gravity="center_vertical"
+                        android:hint="05:00 AM"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textIsSelectable="true"
+                        android:textSize="13sp"
+                        tools:targetApi="o" />
+
+                    <TextView
+                        android:id="@+id/pickup_point"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:focusedByDefault="false"
+                        android:gravity="center_vertical"
+                        android:hint="Pickup Address"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textIsSelectable="true"
+                        android:textSize="15sp"
+                        tools:targetApi="o" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:background="#00FF00" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="7">
+
+                    <TextView
+                        android:id="@+id/arrival_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:focusedByDefault="false"
+                        android:gravity="center_vertical"
+                        android:hint="05:00 AM"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textIsSelectable="true"
+                        android:textSize="13sp"
+                        tools:targetApi="o" />
+
+                    <TextView
+                        android:id="@+id/dropoff_point"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:gravity="center_vertical"
+                        android:hint="Dropoff Address"
+                        android:paddingLeft="40dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="5dp"
+                        android:textIsSelectable="true"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:background="#FF0000" />
+            </RelativeLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/container_error"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
 
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="TODO"
+            android:src="@drawable/exclamation_mark" />
 
-        <RelativeLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:background="#FFF"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="7">
-
-                <TextView
-                    android:id="@+id/departure_time"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:background="#FFF"
-                    android:focusedByDefault="false"
-                    android:gravity="center_vertical"
-                    android:hint="05:00 AM"
-                    android:paddingLeft="40dp"
-                    android:paddingTop="5dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="5dp"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/pickup_point"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:background="#FFF"
-                    android:focusedByDefault="false"
-                    android:gravity="center_vertical"
-                    android:hint="Pickup Address"
-                    android:paddingLeft="40dp"
-                    android:paddingTop="5dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="5dp"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:background="#00FF00" />
-
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFF"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="7">
-
-                <TextView
-                    android:id="@+id/arrival_time"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:background="#FFF"
-                    android:focusedByDefault="false"
-                    android:gravity="center_vertical"
-                    android:hint="05:00 AM"
-                    android:paddingLeft="40dp"
-                    android:paddingTop="5dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="5dp"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/dropoff_point"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:background="#FFF"
-                    android:gravity="center_vertical"
-                    android:hint="Dropoff Address"
-                    android:paddingLeft="40dp"
-                    android:paddingTop="5dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="5dp"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:background="#FF0000" />
-        </RelativeLayout>
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="Booking Failed"
+            android:textSize="35sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/download_ticket"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_file_download_black_24dp" />
 
 </RelativeLayout>

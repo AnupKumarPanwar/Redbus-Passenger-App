@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -26,10 +27,11 @@
         android:gravity="left|center"
         android:hint="Enter PNR ..."
         android:inputType="textPersonName"
-        android:paddingLeft="15sp" />
+        android:importantForAutofill="no"
+        android:paddingLeft="15sp"
+        tools:targetApi="o" />
 
     <LinearLayout
-        android:id="@+id/booking_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/search_bar"
@@ -89,7 +91,9 @@
                 android:paddingTop="5dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="5dp"
-                android:textSize="15sp" />
+                android:textIsSelectable="true"
+                android:textSize="15sp"
+                tools:targetApi="o" />
 
             <View
                 android:layout_width="7dp"
@@ -116,6 +120,7 @@
                 android:paddingTop="5dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="5dp"
+                android:textIsSelectable="true"
                 android:textSize="15sp" />
 
             <View
@@ -127,8 +132,7 @@
         </RelativeLayout>
 
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+        <fragment xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
@@ -138,7 +142,6 @@
     </LinearLayout>
 
     <ProgressBar
-        android:id="@+id/progress_bar"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_below="@+id/search_bar"
@@ -147,10 +150,8 @@
 
 
     <TextView
-        android:id="@+id/no_routes_available"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/recycler_view"
         android:gravity="center"
         android:padding="15dp"
         android:text="No data available."

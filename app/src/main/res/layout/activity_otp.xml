@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,6 +30,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="80dp"
             android:hint="OTP"
+            android:importantForAutofill="no"
             android:inputType="phone" />
 
 
@@ -38,7 +38,6 @@
             android:id="@+id/verify"
             android:layout_width="320dp"
             android:layout_height="60dp"
-            android:layout_centerHorizontal="true"
             android:background="@drawable/orange_button"
             android:text="VERIFY"
             android:textColor="#FFF" />

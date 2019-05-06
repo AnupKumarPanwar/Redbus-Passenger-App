@@ -12,12 +12,13 @@ import android.widget.TextView;
 import com.gotobus.R;
 import com.gotobus.classes.Bus;
 import com.gotobus.screens.SelectedBusActivity;
+import com.gotobus.utility.Journey;
 
 import java.util.ArrayList;
 
 public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder> {
-    Context context;
-    ArrayList<Bus> buses;
+    private final Context context;
+    private final ArrayList<Bus> buses;
 
     public BusesAdapter(Context context, ArrayList<Bus> buses) {
         this.context = context;
@@ -43,6 +44,7 @@ public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(context, SelectedBusActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Journey.busName = buses.get(i).name;
                 intent.putExtra("route_id", buses.get(i).routeId);
                 intent.putExtra("bus_name", buses.get(i).name);
                 intent.putExtra("bus_type", buses.get(i).type);
@@ -61,10 +63,14 @@ public class BusesAdapter extends RecyclerView.Adapter<BusesAdapter.MyViewHolder
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView name, type, fare, departureTime, arrivalTime;
-        LinearLayout container;
+        final TextView name;
+        final TextView type;
+        final TextView fare;
+        final TextView departureTime;
+        final TextView arrivalTime;
+        final LinearLayout container;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.bus_name);
             type = itemView.findViewById(R.id.type);

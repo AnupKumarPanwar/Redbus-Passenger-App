@@ -25,6 +25,7 @@
                     android:layout_marginRight="60dp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:contentDescription="TODO"
                     android:src="@drawable/goto_icon" />
 
 

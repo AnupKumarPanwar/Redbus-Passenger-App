@@ -13,21 +13,23 @@ import com.gotobus.R;
 import com.gotobus.adapters.SeatsAdapter;
 import com.gotobus.classes.Seat;
 import com.gotobus.interfaces.SeatSelectListener;
+import com.gotobus.utility.Journey;
 import com.razorpay.Checkout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
 
 public class SeatSelectionActivity extends AppCompatActivity {
-    RecyclerView seatsGrid;
-    SeatsAdapter seatsAdapter;
-    ArrayList<Seat> seatsRow;
-    String busName;
-    int numSeatsSelected = 0;
-    TextView fareTextView;
-    Button confirmBookingBtn;
+    private RecyclerView seatsGrid;
+    private SeatsAdapter seatsAdapter;
+    private ArrayList<Seat> seatsRow;
+    private String busName;
+    private int numSeatsSelected = 0;
+    private TextView fareTextView;
+    private Button confirmBookingBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class SeatSelectionActivity extends AppCompatActivity {
                     int fare = numSeatsSelected * 500;
                     Intent intent = new Intent(getApplicationContext(), PaymentActivity.class);
                     intent.putExtra("fare", fare);
+                    Journey.fare = fare;
                     startActivity(intent);
                 }
             }
@@ -53,7 +56,7 @@ public class SeatSelectionActivity extends AppCompatActivity {
 
         seatsGrid.setLayoutManager(new GridLayoutManager(getApplicationContext(), 5));
 
-        busName = getIntent().getExtras().get("bus_name").toString();
+        busName = Objects.requireNonNull(getIntent().getExtras().get("bus_name")).toString();
         busName = busName.toLowerCase();
 //        Toast.makeText(getApplicationContext(), busName, Toast.LENGTH_LONG).show();
 
