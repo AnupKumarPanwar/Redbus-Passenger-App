@@ -146,14 +146,7 @@ public class WalletActivity extends AppCompatActivity {
             }
         });
 
-//        GridLayoutManager glm = new GridLayoutManager(getApplicationContext(), 2);
-//        recyclerView.setLayoutManager(glm);
 
-//        cashbacks.add(new Cashback("1", "100", "CREATED"));
-//        cashbacks.add(new Cashback("2", "100", "CREATED"));
-//        cashbacks.add(new Cashback("3", "100", "CREATED"));
-//        cashbacks.add(new Cashback("4", "100", "CREATED"));
-//        cashbacks.add(new Cashback("5", "100", "CREATED"));
 
         cashbacksAdapter.notifyDataSetChanged();
 

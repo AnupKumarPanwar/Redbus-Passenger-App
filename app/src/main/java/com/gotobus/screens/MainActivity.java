@@ -88,27 +88,22 @@ import es.dmoral.toasty.Toasty;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    private GoogleMap mMap;
-
-    private final LatLng mDefaultLocation = new LatLng(28.7041, 77.1025);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1, PERMISSION_REQUEST_PHONE_CALL = 2;
-    private boolean mLocationPermissionGranted, mCallPermissionGranted;
-
-    private Location mLastKnownLocation;
-
-    private FusedLocationProviderClient mFusedLocationProviderClient;
-
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-
+    private final LatLng mDefaultLocation = new LatLng(28.7041, 77.1025);
     private final int AUTOCOMPLETE_SOURCE = 1;
     private final int AUTOCOMPLETE_DESTINATION = 2;
     private final String busType = "";
     private final String PREFS_NAME = "MyApp_Settings";
     Marker sourceMarker;
     Marker destinationMarker;
+    private GoogleMap mMap;
+    private boolean mLocationPermissionGranted, mCallPermissionGranted;
+    private Location mLastKnownLocation;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
     private MarkerOptions sourceMarkerOption;
     private MarkerOptions destinationMarkerOption;
     private MarkerOptions busMarker;
@@ -376,6 +371,8 @@ public class MainActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_LONG).show();
                     } else {
                         searchBus("Sleeper", true);
+                        highlightSelectedOption(sleeper);
+                        sleeper.setBackgroundColor(Color.LTGRAY);
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
@@ -391,6 +388,7 @@ public class MainActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_LONG).show();
                     } else {
                         searchBus("AC", true);
+                        highlightSelectedOption(ac);
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
@@ -406,6 +404,7 @@ public class MainActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_LONG).show();
                     } else {
                         searchBus("Volvo", true);
+                        highlightSelectedOption(volvo);
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select source and destination", Toast.LENGTH_LONG).show();
@@ -441,6 +440,17 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void highlightSelectedOption(LinearLayout view) {
+        unhighlightAllOptions();
+        view.setBackgroundColor(Color.LTGRAY);
+    }
+
+    private void unhighlightAllOptions() {
+        ac.setBackgroundColor(Color.TRANSPARENT);
+        sleeper.setBackgroundColor(Color.TRANSPARENT);
+        volvo.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void cancelBooking() {
@@ -576,6 +586,7 @@ public class MainActivity extends AppCompatActivity
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
             }
         } else {
+            unhighlightAllOptions();
             url = baseUrl + "/search.php";
         }
         mMap.addMarker(sourceMarkerOption);
@@ -759,7 +770,6 @@ public class MainActivity extends AppCompatActivity
                                 bookedBusType = data.get("bus_type").toString();
                                 String[] busLocation = data.get("last_location").toString().split(",");
                                 LatLng origin = new LatLng(Double.parseDouble(busLocation[0]), Double.parseDouble(busLocation[1]));
-//                                Toast.makeText(getApplicationContext(), busType, Toast.LENGTH_LONG).show();
                                 float bearing = Float.parseFloat(data.get("bearing").toString());
                                 switch (busType) {
                                     case "Sleeper":
@@ -785,7 +795,6 @@ public class MainActivity extends AppCompatActivity
                                         break;
                                 }
 
-//                                Toast.makeText(getApplicationContext(), String.valueOf("test"), Toast.LENGTH_LONG).show();
 
                                 if (booked) {
                                     if (currentBusMarker != null) {
@@ -859,7 +868,6 @@ public class MainActivity extends AppCompatActivity
                             }
 
                         } catch (Exception e) {
-//                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -1259,6 +1267,18 @@ public class MainActivity extends AppCompatActivity
         return data;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
+    }
+
     /**
      * A class to parse the Google Places in JSON format
      */
@@ -1358,17 +1378,5 @@ public class MainActivity extends AppCompatActivity
             parserTask.execute(result);
 
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        progressDialog.dismiss();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        progressDialog.dismiss();
     }
 }

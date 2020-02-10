@@ -29,14 +29,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="#FFF"
+                android:ellipsize="end"
                 android:focusedByDefault="false"
                 android:hint="Source"
+                android:importantForAutofill="no"
+                android:inputType=""
+                android:lines="2"
                 android:paddingLeft="40dp"
                 android:paddingTop="5dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="5dp"
-                android:importantForAutofill="no"
-                android:inputType=""
                 android:textSize="15sp"
                 tools:targetApi="o" />
 
@@ -59,13 +61,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="#FFF"
+                android:ellipsize="end"
                 android:hint="Destination"
+                android:importantForAutofill="no"
+                android:inputType=""
+                android:lines="2"
                 android:paddingLeft="40dp"
                 android:paddingTop="5dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="5dp"
-                android:importantForAutofill="no"
-                android:inputType=""
                 android:textSize="15sp" />
 
             <View
@@ -99,9 +103,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="90dp"
+            android:baselineAligned="false"
             android:gravity="center"
             android:orientation="horizontal"
-            android:baselineAligned="false"
             android:weightSum="3">
 
             <LinearLayout
@@ -123,14 +127,6 @@
                     android:gravity="center"
                     android:paddingBottom="3dp"
                     android:text="---" />
-
-                <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                <!--android:layout_width="30dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:src="@drawable/sleeper"-->
-                <!--app:civ_border_width="2dp"-->
-                <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
                     android:layout_width="30dp"
@@ -167,13 +163,6 @@
                     android:paddingBottom="3dp"
                     android:text="---" />
 
-                <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                <!--android:layout_width="30dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:src="@drawable/ac"-->
-                <!--app:civ_border_width="2dp"-->
-                <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
                     android:layout_width="30dp"
@@ -210,13 +199,6 @@
                     android:paddingBottom="3dp"
                     android:text="---" />
 
-                <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                <!--android:layout_width="30dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:src="@drawable/volvo"-->
-                <!--app:civ_border_width="2dp"-->
-                <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
                     android:layout_width="30dp"
@@ -285,32 +267,32 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="3">
-        <TextView
-            android:layout_weight="2"
-            android:id="@+id/booked_bus_eta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="left|center"
-            android:paddingLeft="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:textStyle="bold"
-            android:text="ETA : --:--" />
+
+            <TextView
+                android:id="@+id/booked_bus_eta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="left|center"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="ETA : --:--"
+                android:textStyle="bold" />
 
 
-        <TextView
-            android:layout_weight="1"
-            android:id="@+id/cancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="right|center"
-            android:paddingRight="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:text="Cancel" />
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right|center"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:text="Cancel" />
 
         </LinearLayout>
-
 
 
         <View

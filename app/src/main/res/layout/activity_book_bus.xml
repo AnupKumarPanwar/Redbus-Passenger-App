@@ -62,7 +62,7 @@
             <TextView
                 android:id="@+id/source"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:background="#FFF"
                 android:focusedByDefault="false"
                 android:gravity="center_vertical"
@@ -103,7 +103,7 @@
             <TextView
                 android:id="@+id/destination"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:background="#FFF"
                 android:gravity="center_vertical"
                 android:hint="Destination"
